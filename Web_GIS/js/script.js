@@ -90,6 +90,8 @@ require([
 	var iNumb;
 	var queryLaySelect;
 	
+	//click next to selected feature
+
 	function clickNext(){					
 		if (iNumb<selectedContent.length-1){
 			targetLay = null;						
