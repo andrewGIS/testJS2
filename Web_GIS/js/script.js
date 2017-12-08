@@ -105,6 +105,9 @@ require([
 		}					
 	};		
 
+
+	// click to previous member of selection
+
 	function clickPrevious(){		
 		if (iNumb > 0){
 			targetLay.clearSelection();
