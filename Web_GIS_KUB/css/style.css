@@ -266,8 +266,8 @@ html, body {
 }
 #rightPane{
 	top: 50px;
-	left: 5px;
-	right: 5px;	
+	left: 3px;
+	right: 3px;	
 	position: absolute;
 }
 
