@@ -63,21 +63,13 @@
 			<div id="MIst"></div>				
 		</div>
 		<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;">
-			<div id="leftPane" data-dojo-type="dijit/layout/ContentPane" 
-			data-dojo-props="region:'center'"></div>
-		  <div id="header" data-dojo-type="dijit/layout/ContentPane" 
-			data-dojo-props="region:'top'">
 			<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
 			<div id="pager"> 
-				<button id="previous" style="height: 25px; width:25px;"> </button>				 
-				<button id="next" style="height: 25px; width:25px;"> </button>
-			  <!--<a href='javascript:void(0);' id ="previous" class='nav' style="text-decoration: none;">
-				  &lt; Prev
-			  </a> &nbsp; 
-			  <a href='javascript:void(0);' id="next" class='nav'  style="text-decoration: none;">
-				  Next &gt;
-			  </a>-->
+				<button id="previous" title="Предыдущий" style="height: 25px; width:45px;"><img src="images/arrow_previous.png" style="width: 20px; height: 20px;"></button>				 
+				<button id="next" title="Следующий" style="height: 25px; width:45px;"><img src="images/arrow_next.png" style="width: 20px; height: 20px;"></button>			 
 			</div>
+			<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
+		  	<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">						
 		  </div>
 			<!--<div id="headerIP">
 				<span id="headerIPText">Кликните по объекту для идентификации</span>

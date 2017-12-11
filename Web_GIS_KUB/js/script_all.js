@@ -50,56 +50,6 @@ require([
 		zoom: 7,
 		logo: false
 	});	
-
-	/*window.map = map;
-	map.infoWindow.set("popupWindow", false);
-	initializeSidebar(window.map);
-	function initializeSidebar(map) {
-		var popup = map.infoWindow;
-
-		//when the selection changes update the side panel to display the popup info for the 
-		//currently selected feature. 
-		connect.connect(popup, "onSelectionChange", function() {
-		  displayPopupContent(popup.getSelectedFeature());
-		});
-
-		//when the selection is cleared remove the popup content from the side panel. 
-		connect.connect(popup, "onClearFeatures", function() {
-		  //dom.byId replaces dojo.byId
-		  dom.byId("featureCount").innerHTML = "Click to select feature";
-		  //registry.byId replaces dijit.byId
-		  registry.byId("leftPane").set("content", "");
-		  domUtils.hide(dom.byId("pager"));
-		});
-
-		//When features are associated with the map's info window update the sidebar with the new content. 
-		connect.connect(popup, "onSetFeatures", function() {
-		  displayPopupContent(popup.getSelectedFeature());
-		  if (popup.features.length > 1) {
-			dom.byId("featureCount").innerHTML = popup.features.length + " features selected";
-			//enable navigation if more than one feature is selected 
-			domUtils.show(dom.byId("pager"))
-		  } else {
-			dom.byId("featureCount").innerHTML = popup.features.length + " feature selected";
-			domUtils.hide(dom.byId("pager"));
-		  }
-		});
-	  }
-
-	  function displayPopupContent(feature) {
-		if (feature) {
-		  var content = feature.getContent();
-		  registry.byId("leftPane").set("content", content);
-		}
-	  }
-
-	  function selectPrevious() {
-		window.map.infoWindow.selectPrevious();
-	  }
-
-	  function selectNext() {
-		window.map.infoWindow.selectNext();
-	  }*/
 		
 	var mMeasure;
 	var layerList;	
@@ -141,8 +91,7 @@ require([
 	var ArcGISWTM = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer");
 	
 	var RivBassSmall = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/0", {			
-		outFields: ["*"],							
-		// infoTemplate: new InfoTemplate()
+		outFields: ["*"],		
 	});
 	var RivBassLarge = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/1", {				
 		outFields: ["*"],	
@@ -157,8 +106,7 @@ require([
 	map.addLayers([ArcGISWTM, ArcGISWI, rosreestrMap, rosreestrMapAno, OSMMap, BaseMap]);
 	map.addLayers([DEMMap, TemMaps, BorderKUBMap, PollutionMap]);	
 	map.addLayers([RivBassSmall, RivBassLarge]);	
-	
-			
+				
 	rosreestrMap.hide();
     rosreestrMapAno.hide();
     ArcGISWI.hide();
@@ -315,90 +263,18 @@ require([
 			RivBassSmall.on("mouse-over", cursorOver);
 			RivBassSmall.on("mouse-out", cursorOut);
 			RivBassLarge.on("mouse-over", cursorOver);
-			RivBassLarge.on("mouse-out", cursorOut);
-
-			RivBassSmall.on("click", mouseIdentRBS);
-			RivBassLarge.on("click", mouseIdentRBL);			
+			RivBassLarge.on("mouse-out", cursorOut);						
 		} else {			
 			dom.byId('rightPanel').style.display = 'none';
 			document.getElementById('map').style.right = '40px';
-			RivBassSmall.on("mouse-over", cursorOver);
-			RivBassLarge.on("mouse-over", cursorOut);
-			RivBassLarge.on("click", mouseIdentOff);
-			RivBassSmall.on("click", mouseIdentOff);
+			RivBassSmall.on("mouse-over", cursorOut);
+			RivBassLarge.on("mouse-over", cursorOut);			
 		}		
 	});
 	
 	// Функции для изменения указателя мыши при наведении на идентифицируемый объект
 	function cursorOver() { map.setMapCursor("help"); };
 	function cursorOut() { map.setMapCursor("default"); };
-
-	function mouseIdentRBL(event) {	
-		/*var query = new Query();
-		query.geometry = clickPnt;
-		var clickPnt = new Point (event["mapPoint"]);	
-		RivBassSmall.selectFeatures(query,RivBassLarge.SELECTION_NEW);
-		console.log(RivBassSmall.getSelectedFeatures())			 	
-		var getContent = "<table cellpadding='1'>" + 
-		"<tr><td class='tdGray'>Водоток: </td><td>" + event.graphic.attributes['name'] + "</td></tr>" +		 
-		"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" + event.graphic.attributes['kub_thematic_data.sde.Watershad_large.area'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Средняя высота, м: </td><td>" + event.graphic.attributes['mean_height'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Расброс высот, м: </td><td>" + event.graphic.attributes['range_height'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Средний уклон, град: </td><td>" + event.graphic.attributes['mean_slope'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Густота речной сети по карте 1:1000000, км/кв.км: </td><td>" + event.graphic.attributes['stream_density_1000000'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Лесистость, %: </td><td>" + event.graphic.attributes['forest_percent'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Преобладающий тип леса: </td><td>" + event.graphic.attributes['foresttype'] + "</td></tr>" + 		
-		"</table>"		
-		var clickPnt = new Point (event["mapPoint"]);		
-		var query = new Query();
-		query.geometry = clickPnt;
-		RivBassLarge.queryFeatures(query, selectInBuffer);
-		function selectInBuffer(response) {
-			var feature;
-			var features = response.features;
-			console.log(features);
-			var selectedFeatures = [];			
-			for (var i = 0; i < features.length; i++) {
-			  feature = features[i];
-			  if(feature.geometry.contains(clickPnt)){
-				selectedFeatures.push(feature.attributes['*']);
-			  }
-			}
-			console.log(selectedFeatures);
-		}		
-		registry.byId("rightPanel").set("content", getContent);*/				
-	}
-
-	function mouseIdentRBS(event) {	
-		var query = new Query();		
-		var clickPnt = new Point (event["mapPoint"]);
-		query.geometry = clickPnt;	
-		RivBassSmall.selectFeatures(query,RivBassSmall.SELECTION_NEW, function(e){console.log(e)});
-		//console.log(RivBassSmall.getSelectedFeatures())
-		
-		var getContent = "<table cellpadding='1'>" + 
-		"<tr><td class='tdGray'>Водоток: </td><td>" + event.graphic.attributes['name'] + "</td></tr>" +
-		"<tr><td class='tdGray'>Порядок водотока: </td><td>" + event.graphic.attributes['strahler_order'] + "</td></tr>" +		 
-		"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" + event.graphic.attributes['kub_thematic_data.sde.Watershad_small.area'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Средняя высота, м: </td><td>" + event.graphic.attributes['mean_height'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Расброс высот, м: </td><td>" + event.graphic.attributes['range_height'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Средний уклон, град: </td><td>" + event.graphic.attributes['mean_slope'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Густота речной сети по карте 1:1000000, км/кв.км: </td><td>" + event.graphic.attributes['stream_density_1000000'] + "</td></tr>" + 
-		"<tr><td class='tdGray'>Лесистость, %: </td><td>" + event.graphic.attributes['forest_percent'] + "</td></tr>" +  
-		"<tr><td class='tdGray'>Преобладающий тип леса: </td><td>" + event.graphic.attributes['foresttype'] + "</td></tr>" +
-		"<tr><td class='tdGray'>Озерность, %: </td><td>" + event.graphic.attributes['percent_lake'] + "</td></tr>" +
-		"<tr><td class='tdGray'>Закарстованность, % : </td><td>" + event.graphic.attributes['percent_karst'] + "</td></tr>" +
-		"<tr><td class='tdGray'>Заболоченность, %: </td><td>" + event.graphic.attributes['percent_wetland'] + "</td></tr>" +
-		"<tr><td class='tdGray'>Преобладающий тип почв: </td><td>" + event.graphic.attributes['soiltype'] + "</td></tr>" +
-		"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" + event.graphic.attributes['bedrock_type'] + "</td></tr>" +		
-		"</table>"
-		console.log(getContent);
-		registry.byId("rightPanel").set("content", getContent);
-	}
-
-	function mouseIdentOff(){
-
-	}
 
 	// Отображение координат курсора мыши
 	map.on("mouse-move", showCoordinates);
