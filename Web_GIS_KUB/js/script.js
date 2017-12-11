@@ -60,7 +60,7 @@ require([
 	});
 	
 	var selectionSymbolPol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-		new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205,10,20,1]), 1.5),
+		new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205,10,20,1]), 2.5),
 		new Color([125, 125, 125, 0.5]));	
 	RivBassLarge.setSelectionSymbol(selectionSymbolPol);
 	RivBassSmall.setSelectionSymbol(selectionSymbolPol);
@@ -74,15 +74,18 @@ require([
 	on(dom.byId("InfoBut"), "click", function () {
 		if (dom.byId('rightPanel').style.display == 'none') {			
 			dom.byId('rightPanel').style.display = 'block';
-			document.getElementById('map').style.right = '290px';
-			map.on("click", mouseIdentObj);
+			document.getElementById('map').style.right = '290px';			
+			mapClick = map.on("click", mouseIdentObj);			
 		} else {			
 			dom.byId('rightPanel').style.display = 'none';
 			document.getElementById('map').style.right = '40px';
-			document.getElementById('leftPane').innerHTML = '';			
+			document.getElementById('rightPane').innerHTML = '';			
+			mapClick.remove();
+			targetLay.clearSelection();
 		}
 	});
-	
+
+	var mapClick;
 	var clickPnt;
 	var selectedContent;
 	var selectedFeatures;
@@ -90,26 +93,17 @@ require([
 	var iNumb;
 	var queryLaySelect;
 	
-	//click next to selected feature
-
 	function clickNext(){					
 		if (iNumb<selectedContent.length-1){
-			targetLay = null;						
+			targetLay.clearSelection();						
 			iNumb = iNumb+1;															
 			queryLaySelect = new Query();
 			queryLaySelect.objectIds = [selectedContent[iNumb][1]];				
 			targetLay = map.getLayer(selectedContent[iNumb][2]);								
 			targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);									
-			document.getElementById("leftPane").innerHTML = selectedContent[iNumb][0];
-			console.log(selectedContent[iNumb][0]);										
+			document.getElementById("rightPane").innerHTML = selectedContent[iNumb][0];												
 		}					
 	};		
-
-	// test comment in branch test
-
-
-	
-	// click to previous member of selection
 
 	function clickPrevious(){		
 		if (iNumb > 0){
@@ -119,19 +113,18 @@ require([
 			queryLaySelect.objectIds = [selectedContent[iNumb][1]];			
 			targetLay = map.getLayer(selectedContent[iNumb][2]);			
 			targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);			
-			registry.byId("leftPane").set("content", selectedContent[iNumb][0]);									
+			registry.byId("rightPane").set("content", selectedContent[iNumb][0]);									
 		}										
 	}
 
 	function mouseIdentObj(event) {
-		document.getElementById('leftPane').innerHTML = '';
+		document.getElementById('rightPane').innerHTML = '';
 		iNumb = 0;
 		clickPnt = null;
 		targetLay = null;
 		selectedFeatures = null;
 		selectedContent = null;
-		queryLaySelect = null;
-		console.log(selectedContent);	
+		queryLaySelect = null;			
 		var queryClick = new Query();		
 		clickPnt = new Point (event["mapPoint"]);
 		queryClick.geometry = clickPnt;					
@@ -145,7 +138,9 @@ require([
 			});										
 		});							
 				
-		function createContent(){			
+		function createContent(){
+			RivBassLarge.clearSelection();
+			RivBassSmall.clearSelection();			
 			console.log(selectedFeatures.length);
 			console.log(selectedFeatures);								
 				for (k=0; k<selectedFeatures[1].length; k++){
@@ -156,7 +151,7 @@ require([
 					"<tr><td class='tdGray'>Средняя высота, м: </td><td>" + selectedFeatures[1][k].attributes['mean_height'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Расброс высот, м: </td><td>" + selectedFeatures[1][k].attributes['range_height'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Средний уклон, град: </td><td>" + selectedFeatures[1][k].attributes['mean_slope'] + "</td></tr>" + 
-					"<tr><td class='tdGray'>Густота речной сети по карте 1:1000000, км/кв.км: </td><td>" + selectedFeatures[1][k].attributes['stream_density_1000000'] + "</td></tr>" + 
+					"<tr><td class='tdGray'>Густота речной сети по карте масштаба 1:1000000, км/кв.км: </td><td>" + selectedFeatures[1][k].attributes['stream_density_1000000'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Лесистость, %: </td><td>" + selectedFeatures[1][k].attributes['forest_percent'] + "</td></tr>" +  
 					"<tr><td class='tdGray'>Преобладающий тип леса: </td><td>" + selectedFeatures[1][k].attributes['foresttype'] + "</td></tr>" +
 					"<tr><td class='tdGray'>Озерность, %: </td><td>" + selectedFeatures[1][k].attributes['percent_lake'] + "</td></tr>" +
@@ -174,26 +169,21 @@ require([
 					"<tr><td class='tdGray'>Средняя высота, м: </td><td>" + selectedFeatures[0][l].attributes['mean_height'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Расброс высот, м: </td><td>" + selectedFeatures[0][l].attributes['range_height'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Средний уклон, град: </td><td>" + selectedFeatures[0][l].attributes['mean_slope'] + "</td></tr>" + 
-					"<tr><td class='tdGray'>Густота речной сети по карте 1:1000000, км/кв.км: </td><td>" + selectedFeatures[0][l].attributes['stream_density_1000000'] + "</td></tr>" + 
+					"<tr><td class='tdGray'>Густота речной сети по карте масштаба 1:1000000, км/кв.км: </td><td>" + selectedFeatures[0][l].attributes['stream_density_1000000'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Лесистость, %: </td><td>" + selectedFeatures[0][l].attributes['forest_percent'] + "</td></tr>" + 
 					"<tr><td class='tdGray'>Преобладающий тип леса: </td><td>" + selectedFeatures[0][l].attributes['foresttype'] + "</td></tr>" +		
 					"</table>"					
 					selectedContent.push([getContent,selectedFeatures[0][l].attributes['objectid'],selectedFeatures[0][l]._layer.id]);										
-				}			
-			console.log(selectedContent);			
+				}						
 			fillContent();								
 		}
 		
 		function fillContent(){									
-			registry.byId("leftPane").set("content", selectedContent[0][0]);
+			registry.byId("rightPane").set("content", selectedContent[0][0]);
 			queryLaySelect = new Query();
 			queryLaySelect.objectIds = [selectedContent[0][1]];			
 			targetLay = map.getLayer(selectedContent[0][2]);			
-			targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);			
-			/*if (selectedContent.length>1) {						
-				on(dom.byId("next"), "click", clickNext);
-				on(dom.byId("previous"), "click", clickPrevious);
-			}*/		
+			targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);					
 		}
 	}		
 });
