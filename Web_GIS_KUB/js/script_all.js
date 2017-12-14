@@ -59,6 +59,12 @@ require([
 		var mMeasure;
 		var layerList;
 
+		var mapClick;
+
+		// мои переменные
+		var selectedInfoNumber;
+		var identifyResult;
+
 		var identifyTask, identifyParams;
 
 		map.on('load', function (results) {
@@ -80,6 +86,9 @@ require([
 			mMeasure.startup();
 
 			initFunctionallity();
+
+			assertClick();
+
 
 		});
 
@@ -265,6 +274,10 @@ require([
 
 		// Инфопанель справа
 		on(dom.byId("InfoBut"), "click", function () {
+
+			// identify event
+			map.on("click", doIdentify)
+
 			if (dom.byId('rightPanel').style.display == 'none') {
 				dom.byId('rightPanel').style.display = 'block';
 				dom.byId('dMeasurePane').style.display = 'none';
@@ -329,15 +342,14 @@ require([
 			}
 		});
 
-		// Параметры для идентификации
+		// Identify parameters
 		function initFunctionallity() {
-			map.on("click", doIdentify);
+			//map.on("click", doIdentify);
 			identifyTask = new IdentifyTask("http://maps.psu.ru:8080/arcgis/rest/services/" +
 				"KUB/Pollution_KUB/MapServer");
 
 			identifyParams = new IdentifyParameters();
 			identifyParams.tolerance = 3;
-			identifyParams.returnGeometry = true;
 			identifyParams.layerIds = [0, 1, 2, 3, 4, 5, 6];
 			identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
 			identifyParams.width = map.width;
@@ -354,13 +366,123 @@ require([
 			identifyParams.mapExtent = map.extent;
 			identifyTask.execute(identifyParams, function (idResults) {
 				//addToMap(idResults, event);
-				console.log(idResults);
-				console.log(event);
+				//console.log(idResults[0]);
+				//console.log(event);
+
+				if (idResults.length == 0) {
+
+					idResults = ["No results"]
+				}
+
+				identifyResults = idResults;
+
+				selectedInfoNumber = 0;
+
+				loadResults(selectedInfoNumber);
+
 			});
 
 		}
 
+		//create table from object
+
+		function createTable(currentObject) {
+
+			if (currentObject == "No results") {
+
+				return "No results"
+			}
+
+			let getContent = "<table cellpadding='1'>" +
+				"<tr><td class='tdGray'>Водоток: </td><td>" +
+				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+				"<tr><td class='tdGray'>Порядок водотока: </td><td>" +
+				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+				"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" +
+				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+				"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
+				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+				"<tr><td class='tdGray'></td><td>" +
+				"<button id = 'addInfo'> Кнопка </button></td></tr>" +
+				"</table>"
+
+			return getContent
+		}
 
 
+		//load identify results to dom element
+
+		function loadResults(number) {
+
+			registry.byId("rightPane").set("content",
+				createTable(identifyResults[number]));
+
+			on(dom.byId("addInfo"), "click", showAddInfo);
+
+		}
+
+		// assert click for next and previous
+		function assertClick() {
+			on(dom.byId("next"), "click", nextClick);
+			on(dom.byId("previous"), "click", previousClick);
+		}
+
+		// next click
+
+		function nextClick() {
+			try {
+
+				loadResults(selectedInfoNumber + 1);
+				selectedInfoNumber = selectedInfoNumber + 1
+
+			} catch (error) {
+				console.log(error)
+			}
+			finally {
+				//
+			}
+		}
+
+		// previous click
+
+		function previousClick() {
+			try {
+
+				loadResults(selectedInfoNumber - 1);
+				selectedInfoNumber = selectedInfoNumber - 1
+
+			} catch (error) {
+				console.log(error)
+			}
+			finally {
+				//
+			}
+		}
+
+		function showAddInfo() {
+
+			console.log(identifyResults[selectedInfoNumber])
+
+			alert(identifyResults[selectedInfoNumber].feature.attributes.OBJECTID)
+
+			console.log(map.layerIds)
+
+			let relatedQuery = new RelationshipQuery();
+			// need to be dynamic relatedQuery.relationshipId
+			relatedQuery.relationshipId = 3;
+			relatedQuery.objectIds = [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID];
+
+			let layerID = identifyResults[selectedInfoNumber].layerId
+			//let incidentLayer = map.getLayer(map.layerIds[4])
+			let targetLyr = FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" +
+				layerID)
+			targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+
+				//alert(relatedRecords);
+				console.log(relatedRecords)
+
+			});
+
+		}
 
 	});
