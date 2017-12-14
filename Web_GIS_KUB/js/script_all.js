@@ -355,7 +355,7 @@ require([
 			identifyTask.execute(identifyParams, function (idResults) {
 				//addToMap(idResults, event);
 				console.log(idResults);
-				console.log(event);
+				//console.log(event);
 			});
 
 		}
