@@ -480,6 +480,7 @@ require([
 
 				//alert(relatedRecords);
 				console.log(relatedRecords)
+				console.log(relatedRecords)
 
 			});
 
