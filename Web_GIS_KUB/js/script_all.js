@@ -3,7 +3,8 @@
 
 require([
 	"esri/config", "esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/WebTiledLayer", "esri/layers/FeatureLayer", "esri/layers/ArcGISImageServiceLayer", "esri/layers/ImageParameters", "esri/layers/RasterLayer",
-	"esri/SpatialReference", "esri/geometry/Extent", "esri/geometry/webMercatorUtils", "esri/InfoTemplate", "esri/Color", "esri/renderers/SimpleRenderer", "esri/geometry/Point",
+	"esri/SpatialReference", "esri/geometry/Extent", "esri/geometry/webMercatorUtils", "esri/InfoTemplate",
+	"esri/dijit/InfoWindow", "esri/Color", "esri/renderers/SimpleRenderer", "esri/geometry/Point",
 	"esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleFillSymbol", "esri/symbols/SimpleLineSymbol",
 	"esri/tasks/query", "esri/tasks/QueryTask", "esri/tasks/RelationshipQuery", "esri/tasks/GeometryService",
 	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar",
@@ -24,7 +25,7 @@ require([
 	"dojo/domReady!"
 ], function (
 	esriConfig, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, WebTiledLayer, FeatureLayer, ArcGISImageServiceLayer, ImageParameters, RasterLayer,
-	SpatialReference, Extent, webMercatorUtils, InfoTemplate, Color, SimpleRenderer, Point,
+	SpatialReference, Extent, webMercatorUtils, InfoTemplate, InfoWindow, Color, SimpleRenderer, Point,
 	SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
 	Query, QueryTask, RelationshipQuery, GeometryService,
 	Measurement, Units, LayerList, Legend, Popup, PopupTemplate, HomeButton, OverviewMap, Scalebar,
@@ -358,7 +359,7 @@ require([
 
 		}
 
-		// Identify test
+		// Identify
 		function doIdentify(event) {
 
 			//map.graphics.clear();
@@ -380,6 +381,8 @@ require([
 
 				loadResults(selectedInfoNumber);
 
+				document.getElementById("featureCount").innerHTML = "Выбрано объектов: "+identifyResults.length;
+
 			});
 
 		}
@@ -393,20 +396,29 @@ require([
 				return "No results"
 			}
 
-			let getContent = "<table cellpadding='1'>" +
-				"<tr><td class='tdGray'>Водоток: </td><td>" +
-				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-				"<tr><td class='tdGray'>Порядок водотока: </td><td>" +
-				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-				"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" +
-				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-				"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
-				currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-				"<tr><td class='tdGray'></td><td>" +
-				"<button id = 'addInfo'> Кнопка </button></td></tr>" +
-				"</table>"
+			//console.log(currentObject);
 
-			return getContent
+			//let infoTemplate = new InfoTemplate(currentObject.layerName, "${*}","Hellow");
+
+
+			//let currentContent = "<b>" + currentObject.layerName + "</b><br/>"
+
+			let currentContent = "<table cellpadding='1'>"
+			currentContent += "<tr><td class='tdGray'>Слой: </td><td>" +
+				currentObject.layerName + "</td></tr>"+
+				"<tr><td class='tdGray'>OBJECTID: </td><td>" +
+				currentObject.feature.attributes.OBJECTID + "</td></tr>"
+			// 	"<tr><td class='tdGray'>Порядок водотока: </td><td>" +
+			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+			// 	"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" +
+			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+			// 	"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
+			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
+			// 	"<tr><td class='tdGray'></td><td>" 
+			currentContent +="<button id = 'addInfo'> Дополнительная информация </button></td></tr></table>"
+
+			return currentContent
+			//return infoTemplate;
 		}
 
 
@@ -433,7 +445,7 @@ require([
 			try {
 
 				loadResults(selectedInfoNumber + 1);
-				selectedInfoNumber = selectedInfoNumber + 1
+				selectedInfoNumber = selectedInfoNumber + 1;
 
 			} catch (error) {
 				console.log(error)
@@ -459,31 +471,74 @@ require([
 			}
 		}
 
+		// query related features for objects
+
 		function showAddInfo() {
 
-			console.log(identifyResults[selectedInfoNumber])
+			//console.log(identifyResults[selectedInfoNumber])
 
-			alert(identifyResults[selectedInfoNumber].feature.attributes.OBJECTID)
+			//alert(identifyResults[selectedInfoNumber].feature.attributes.OBJECTID)
 
-			console.log(map.layerIds)
+			//console.log(map.layerIds)
 
-			let relatedQuery = new RelationshipQuery();
-			// need to be dynamic relatedQuery.relationshipId
-			relatedQuery.relationshipId = 3;
-			relatedQuery.objectIds = [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID];
+			var layerID = identifyResults[selectedInfoNumber].layerId
 
-			let layerID = identifyResults[selectedInfoNumber].layerId
-			//let incidentLayer = map.getLayer(map.layerIds[4])
 			let targetLyr = FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" +
 				layerID)
-			targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
 
-				//alert(relatedRecords);
-				console.log(relatedRecords)
-				console.log(relatedRecords)
+			let relatedQuery = new RelationshipQuery();
 
-			});
+			relatedQuery.objectIds = [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID];
+			relatedQuery.outFields = ["*"];
 
+			var relatedTaskResult = [];
+
+			// execute related task for each layer specificly
+
+			switch (layerID) {
+				case 2:
+					relatedQuery.relationshipId = 0;
+					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+						//alert(relatedRecords);
+						relatedTaskResult.push(relatedRecords);
+						console.log(relatedRecords);
+					});
+					brake;
+					relatedQuery.relationshipId = 1;
+					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+						//alert(relatedRecords);
+						relatedTaskResult.push(relatedRecords);
+						console.log(relatedRecords);
+					});
+					break;
+				case 3:
+					relatedQuery.relationshipId = 2;
+					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+						//alert(relatedRecords);
+						relatedTaskResult.push(relatedRecords);
+						console.log(relatedRecords);
+					});
+					break;
+				case 4:
+					relatedQuery.relationshipId = 3;
+					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+						//alert(relatedRecords);
+						relatedTaskResult.push(relatedRecords);
+						console.log(relatedRecords);
+					});
+					break;
+				case 5:
+					relatedQuery.relationshipId = 4;
+					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+						//alert(relatedRecords);
+						relatedTaskResult.push(relatedRecords);
+						console.log(relatedRecords);
+					});
+					break;
+				default:
+					console.log('No related records');
+					break;
+
+			}
 		}
-
 	});
