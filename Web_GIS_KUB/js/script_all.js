@@ -415,7 +415,9 @@ require([
 			// 	"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
 			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
 			// 	"<tr><td class='tdGray'></td><td>" 
-			currentContent +="<button id = 'addInfo'> Дополнительная информация </button></td></tr></table>"
+			currentContent +="<button id = 'addInfo'> Доп.информация </button></td></tr></table>"
+			//currentContent +='<button id = "addInfo"> Доп. </a></button>'
+
 
 			return currentContent
 			//return infoTemplate;
@@ -429,7 +431,8 @@ require([
 			registry.byId("rightPane").set("content",
 				createTable(identifyResults[number]));
 
-			on(dom.byId("addInfo"), "click", showAddInfo);
+			// on(dom.byId("addInfo"), "click", showAddInfo);
+			on(dom.byId("addInfo"), "click", loadModal);
 
 		}
 
@@ -490,25 +493,29 @@ require([
 
 			relatedQuery.objectIds = [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID];
 			relatedQuery.outFields = ["*"];
+			// need to create of list neccessary 
+			//relatedQuery.outFields = [];
 
 			var relatedTaskResult = [];
 
 			// execute related task for each layer specificly
 
+
+			// rewrite this code (execeute query 1 time)
 			switch (layerID) {
 				case 2:
 					relatedQuery.relationshipId = 0;
 					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
 						//alert(relatedRecords);
 						relatedTaskResult.push(relatedRecords);
-						console.log(relatedRecords);
+						console.log(relatedTaskResult);
 					});
-					brake;
+					break;
 					relatedQuery.relationshipId = 1;
 					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
 						//alert(relatedRecords);
 						relatedTaskResult.push(relatedRecords);
-						console.log(relatedRecords);
+						console.log(relatedTaskResult);
 					});
 					break;
 				case 3:
@@ -516,7 +523,7 @@ require([
 					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
 						//alert(relatedRecords);
 						relatedTaskResult.push(relatedRecords);
-						console.log(relatedRecords);
+						console.log(relatedTaskResult);
 					});
 					break;
 				case 4:
@@ -524,7 +531,7 @@ require([
 					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
 						//alert(relatedRecords);
 						relatedTaskResult.push(relatedRecords);
-						console.log(relatedRecords);
+						console.log(relatedTaskResult);
 					});
 					break;
 				case 5:
@@ -532,7 +539,7 @@ require([
 					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
 						//alert(relatedRecords);
 						relatedTaskResult.push(relatedRecords);
-						console.log(relatedRecords);
+						console.log(relatedTaskResult);
 					});
 					break;
 				default:

@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Bar Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+    <style>
+        canvas {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+
+        #container2 {
+            display: inline;
+            float: right;
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container" style="width: 75%;">
+        <canvas id="canvas"></canvas>
+    </div>
+    <div id="container2" style="width: 25%;">
+        <div id="listAttr">
+            <form>
+                <fieldset id="listIndicator">
+                    <legend id="listIndicator2">Показатели</legend>
+                    <!--<input type="checkbox" name="animal" value="ph" />Кислотность
+                    <br />
+                    <input type="checkbox" name="animal" value="so4" />Окись серы
+                    <br />
+                    <input type="checkbox" name="animal" value="h3" />Тритий
+                    <br />-->
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <!--<button id="addDataset">Add Dataset</button>-->
+    <!--<button id="removeDataset">Remove Dataset</button>-->
+    <button id="addDate">Добавить дату</button>
+    <button id="removeDate">Удалить дату</button>
+    <button id="recalcPDK">Пересчитать в ПДК</button>
+</body>
+
+</html>
