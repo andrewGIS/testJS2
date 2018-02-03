@@ -1,4 +1,4 @@
-function returnBlankTemplate(){
+function returnBlankTemplate() {
     return elements = {
         "ci": {
             "color": "rgb(255,0,0)",
@@ -152,8 +152,8 @@ function returnBlankTemplate(){
         }
     }
 }
- function returnTestData() {
-     
+function returnTestData() {
+
     // test data
 
     var testIndicatorsValues = {
@@ -177,4 +177,14 @@ function returnBlankTemplate(){
         }
     }
     return testIndicatorsValues;
- }
+}
+function returnSecondTemplate() {
+    return discharge = {
+        "rashod": {
+                "color": "",
+                "alias": "Расход",
+                "values": [],
+                "limit": 0
+        }
+    }
+}

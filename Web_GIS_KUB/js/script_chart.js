@@ -1,14 +1,15 @@
-var barChartData;// 
-var myBar;
+var barChartData;// data for chart
+var myBar;// graphic
 var targetCanvas;// canvas for chart drawing
 var nativeData; // store for initial data
-var chartType = 'bar';// variable for first type of chart
+var chartType;// variable for first type of chart
 var indicatorsValues;// keep template from elements with filled data
 var dateValues;// list of obesrvation day
-var firstElement = "ph"; // first indicator to show
+var firstElement; // first indicator to show
 var charTitle;
 var color;// variable from samples with charts
 var colorNames;// variable from samples with charts
+var dataForChartRaw;// variable from samples with charts
 
 
 function modalListener() {
@@ -25,11 +26,13 @@ function modalListener() {
         document.getElementById("modal-listDates").innerHTML = "";
         document.getElementById("modal-listIndicator").innerHTML = "";
         $("#addInfo").off();
+        $("#toggleTable").off();
     });
 
     // listener for buttons
     document.getElementById("recalcPDK").addEventListener('click', recalcPDK);
     document.getElementById("toggleChart").addEventListener('click', toggleChart);
+    document.getElementById("toggleTable").addEventListener('click', toggleTable);
 
 
     // listener for checkbox of indicators
@@ -121,13 +124,21 @@ function init() {
 
 function loadModal(dataForChart) {
     // calc variable for each record
-    indicatorsValues = pushElementsValues(dataForChart[0])
+    chartType = 'bar';
+    dataForChartRaw = dataForChart;
+    indicatorsValues = pushElementsValues(dataForChart[0], 1);
     dateValues = dataForChart[0].map(function (e) { return parseInt(Object.keys(e)[0]) })
     charTitle = Object.values(dataForChart[0]["0"])[0].naimenovanie; // get name from first object
     color = Chart.helpers.color;
     colorNames = Object.keys(window.chartColors);
     targetCanvas = document.getElementById("modal-canvas").getContext("2d");
-
+    firstElement = "ph";
+    if (dataForChart.length > 1) {
+        $("#toggleTable").prop("disabled", false);
+    }
+    else {
+        $("#toggleTable").prop("disabled", true);
+    }
     init();
 
 }
@@ -220,10 +231,10 @@ function createCheckboxesIndicator(arr) {
     for (indicator in arr) {
 
         if (indicator == firstElement) {
-            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + ' checked="checked" id = '+ arr[indicator]["alias"] +' />' + '<label for='+arr[indicator]["alias"]+' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
+            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + ' checked="checked" id = ' + arr[indicator]["alias"] + ' />' + '<label for=' + arr[indicator]["alias"] + ' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
         }
         else {
-            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + '  id = '+ arr[indicator]["alias"] +' />' + '<label for='+arr[indicator]["alias"]+' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
+            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + '  id = ' + arr[indicator]["alias"] + ' />' + '<label for=' + arr[indicator]["alias"] + ' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
         }
     }
 }
@@ -235,8 +246,8 @@ function createCheckboxesDates(arr) {
 
     arr.forEach(function (e, index) {
 
-        fldList.innerHTML +='<input type="checkbox" name="dates" value=' + e + ' checked="checked" id = '+ e +' />' +
-        '<label for='+e+' class = "labelDates">' + formateDate(e) + '</label>'
+        fldList.innerHTML += '<input type="checkbox" name="dates" value=' + e + ' checked="checked" id = ' + e + ' />' +
+            '<label for=' + e + ' class = "labelDates">' + formateDate(e) + '</label>'
 
     })
 
@@ -318,11 +329,11 @@ function recalcPDK() {
     myBar.update();
 }
 
-function pushElementsValues(ObjectForFill) {
+function pushElementsValues(ObjectForFill, index) {
     // writing data from object to template which are in elemenets.js
     //storing the default data
     nativeData = ObjectForFill.valueOf();
-    elements = returnBlankTemplate();
+    elements = (index == 1) ? returnBlankTemplate() : returnSecondTemplate();
     for (var key in elements) {
         elements[key].values = ObjectForFill.map(function (e) {
             for (let dateValue in e) {
@@ -356,4 +367,32 @@ function toggleChart() {
             }
         }
     });
+}
+
+function toggleTable() {
+    //console.log(dataForChartRaw[1])
+    if (document.getElementById("toggleTable").innerHTML == "Данные по расходам"){
+        myBar.destroy();
+        document.getElementById("modal-listDates").innerHTML = "";
+        document.getElementById("modal-listIndicator").innerHTML = "";
+        indicatorsValues = pushElementsValues(dataForChartRaw[1], 2);
+        dateValues = dataForChartRaw[1].map(function (e) { return parseInt(Object.keys(e)[0]) });
+        charTitle = "Данные по расходам"; // get name from first object
+        color = Chart.helpers.color;
+        colorNames = Object.keys(window.chartColors);
+        firstElement = "rashod";
+        $("#toggleTable").html("Данные по элементам");
+        $("#recalcPDK").prop("disabled", true);
+        init();
+
+    }
+    else{
+        $("#toggleTable").html("Данные по расходам");
+        myBar.destroy();
+        document.getElementById("modal-listDates").innerHTML = "";
+        document.getElementById("modal-listIndicator").innerHTML = "";
+        $("#recalcPDK").prop("disabled", false);
+        loadModal(dataForChartRaw);
+    }
+
 }

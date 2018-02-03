@@ -417,7 +417,9 @@ require([
 			// 	"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
 			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
 			// 	"<tr><td class='tdGray'></td><td>" 
-			currentContent += "<button id = 'addInfo'> Доп.информация </button></td></tr></table>"
+			currentContent += "<td><tr><button id = 'addInfo'> Доп.информация </button></td></tr></table>"
+			// if currentObject.layer
+			// 
 			//currentContent +='<button id = "addInfo"> Доп. </a></button>'
 
 
@@ -541,7 +543,13 @@ require([
 						//console.log(new Date(element.attributes.date_proby))
 
 						// !!! in other table maybe other name of date_proby!!! 
-						let dateValue = parseInt(element.attributes.date_proby)
+						let dateValue;
+
+						if (parseInt(element.attributes.date_proby)) {
+							dateValue = parseInt(element.attributes.date_proby);
+						} else {
+							dateValue = parseInt(element.attributes.data);
+						}
 						if (dateValue) {
 							transformObject[dateValue] = element.attributes
 						}
@@ -553,7 +561,7 @@ require([
 				}
 
 			});
-			//console.log(arr);
+			
 			if (arr.length) {
 				loadModal(arr);
 			} else {

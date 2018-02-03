@@ -1,7 +1,7 @@
 .modal,
 .modal-box {
   z-index: 900;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .modal-sandbox {
@@ -148,4 +148,21 @@ input[name="indicators"] + .labelIndicators {
 input[name="indicators"]:checked + .labelIndicators {
 	color: #5D5D5D;
 }
-
+.modalButton {
+  font-size:12px;
+  background-color: transparent;
+  border: 3px solid #fff;
+  border-radius: 0.6em;
+  color: $red;
+  cursor: pointer;
+  align-self: center;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 200;
+  border-radius: 3em;
+  transition: background 150ms ease-in-out, color 150ms ease-in-out;
+}
+.modalButton:hover{
+  color: #55D8C6;
+  background-position: 0 100%;
+}
