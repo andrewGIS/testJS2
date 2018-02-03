@@ -90,6 +90,8 @@ require([
 
 			assertClick();
 
+			modalListener();
+
 
 		});
 
@@ -381,7 +383,7 @@ require([
 
 				loadResults(selectedInfoNumber);
 
-				document.getElementById("featureCount").innerHTML = "Выбрано объектов: "+identifyResults.length;
+				document.getElementById("featureCount").innerHTML = "Выбрано объектов: " + identifyResults.length;
 
 			});
 
@@ -405,7 +407,7 @@ require([
 
 			let currentContent = "<table cellpadding='1'>"
 			currentContent += "<tr><td class='tdGray'>Слой: </td><td>" +
-				currentObject.layerName + "</td></tr>"+
+				currentObject.layerName + "</td></tr>" +
 				"<tr><td class='tdGray'>OBJECTID: </td><td>" +
 				currentObject.feature.attributes.OBJECTID + "</td></tr>"
 			// 	"<tr><td class='tdGray'>Порядок водотока: </td><td>" +
@@ -415,7 +417,7 @@ require([
 			// 	"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
 			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
 			// 	"<tr><td class='tdGray'></td><td>" 
-			currentContent +="<button id = 'addInfo'> Доп.информация </button></td></tr></table>"
+			currentContent += "<button id = 'addInfo'> Доп.информация </button></td></tr></table>"
 			//currentContent +='<button id = "addInfo"> Доп. </a></button>'
 
 
@@ -431,8 +433,8 @@ require([
 			registry.byId("rightPane").set("content",
 				createTable(identifyResults[number]));
 
-			// on(dom.byId("addInfo"), "click", showAddInfo);
-			on(dom.byId("addInfo"), "click", loadModal);
+			on(dom.byId("addInfo"), "click", showAddInfo);
+			//on(dom.byId("addInfo"), "click", loadModal);
 
 		}
 
@@ -451,7 +453,8 @@ require([
 				selectedInfoNumber = selectedInfoNumber + 1;
 
 			} catch (error) {
-				console.log(error)
+				// console.log(error)
+				console.log("Дошли до конца")
 			}
 			finally {
 				//
@@ -467,14 +470,19 @@ require([
 				selectedInfoNumber = selectedInfoNumber - 1
 
 			} catch (error) {
-				console.log(error)
+				//console.log(error)
+				console.log("Дошли до начала")
 			}
 			finally {
 				//
 			}
 		}
 
-		// query related features for objects
+		// query related features for selected object
+		// make parameter as layer
+		// check async
+		// need to create of list neccessary 
+		//relatedQuery.outFields = [];
 
 		function showAddInfo() {
 
@@ -484,68 +492,76 @@ require([
 
 			//console.log(map.layerIds)
 
-			var layerID = identifyResults[selectedInfoNumber].layerId
+			let layerID = identifyResults[selectedInfoNumber].layerId
 
-			let targetLyr = FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" +
+			let targetLyr = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" +
 				layerID)
 
-			let relatedQuery = new RelationshipQuery();
+			let relatedTaskResult = [];
 
-			relatedQuery.objectIds = [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID];
-			relatedQuery.outFields = ["*"];
-			// need to create of list neccessary 
-			//relatedQuery.outFields = [];
+			targetLyr.on("load", function () {
 
-			var relatedTaskResult = [];
+				var relatedQuery = new RelationshipQuery();
 
-			// execute related task for each layer specificly
+				relatedQuery.objectIds = [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID];
+				relatedQuery.outFields = ["*"];
 
+				Promise.all(targetLyr.relationships.map(function (element) {
 
-			// rewrite this code (execeute query 1 time)
-			switch (layerID) {
-				case 2:
-					relatedQuery.relationshipId = 0;
-					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
-						//alert(relatedRecords);
-						relatedTaskResult.push(relatedRecords);
-						console.log(relatedTaskResult);
-					});
-					break;
-					relatedQuery.relationshipId = 1;
-					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
-						//alert(relatedRecords);
-						relatedTaskResult.push(relatedRecords);
-						console.log(relatedTaskResult);
-					});
-					break;
-				case 3:
-					relatedQuery.relationshipId = 2;
-					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
-						//alert(relatedRecords);
-						relatedTaskResult.push(relatedRecords);
-						console.log(relatedTaskResult);
-					});
-					break;
-				case 4:
-					relatedQuery.relationshipId = 3;
-					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
-						//alert(relatedRecords);
-						relatedTaskResult.push(relatedRecords);
-						console.log(relatedTaskResult);
-					});
-					break;
-				case 5:
-					relatedQuery.relationshipId = 4;
-					targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
-						//alert(relatedRecords);
-						relatedTaskResult.push(relatedRecords);
-						console.log(relatedTaskResult);
-					});
-					break;
-				default:
-					console.log('No related records');
-					break;
+					//console.log(element.id);
 
-			}
+					relatedQuery.relationshipId = element.id
+
+					// return promise in list with map function
+					return targetLyr.queryRelatedFeatures(relatedQuery, function (relatedRecords) {
+						// in promise return related record
+						return relatedRecords;
+					})
+				})).then(values => prepareRelatedDataToChart(values));
+			})
 		}
+
+		function prepareRelatedDataToChart(arrOfData) {
+			// transform related data from server to specific view:
+			// arr - for each related table
+			var arr = arrOfData.map(function (e) {
+				//console.log(e);
+
+				// go by key necessary for accessing features
+				for (key in e) {
+					var dates;
+					//console.log(element[key].features)
+
+					// each feature transform to object with date key 
+					//and atrributes as property and return in list
+					dates = e[key].features.map(function (element) {
+
+						var transformObject = {};
+						//dateArr.push(element.attributes.date_proby)
+						//console.log(new Date(element.attributes.date_proby))
+
+						// !!! in other table maybe other name of date_proby!!! 
+						let dateValue = parseInt(element.attributes.date_proby)
+						if (dateValue) {
+							transformObject[dateValue] = element.attributes
+						}
+						return transformObject
+					})
+					return dates.sort(function (a, b) {
+						return parseInt(Object.keys(a)[0]) - parseInt(Object.keys(b)[0])
+					});
+				}
+
+			});
+			//console.log(arr);
+			if (arr.length) {
+				loadModal(arr);
+			} else {
+				alert("Нет дополнительной информации для точки")
+			}
+
+
+		}
+
 	});
+

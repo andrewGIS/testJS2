@@ -1,6 +1,7 @@
 .modal,
 .modal-box {
   z-index: 900;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
 .modal-sandbox {
@@ -28,21 +29,23 @@
   position: relative;
   width: 80%;
   max-width: 920px;
-  margin: 100px auto;
+  margin: 15px auto;
   animation-name: modalbox;
   animation-duration: .3s;
   animation-timing-function: ease-out;
 }
 
 .modal-header {
-  padding: 20px 40px;
+  padding: 5px 5px;
   background: #546E7A;
   color: #ffffff;
+  text-align: center;
+  font-size: 10px;
 }
 
 .modal-body {
   background: #ECEFF1;
-  padding: 60px 40px;
+  padding: 20px 20px;
 }
 
 /* Close Button */
@@ -74,47 +77,75 @@
   }
 }
 
-/* Aditional Styles */
-/** {
-  font-family: "Roboto", sans-serif;
-  font-weight: normal;
-}*/
+#divDates, #divIndicators{
+  font-size: 14px;
 
-/* p {
-  line-height: 1.4em;
 }
 
-body {
-  background: #B0BEC5;
-} */
-
-/* .modal-trigger, button {
-  top: 50%;
-  left: 50%;
-  padding: 20px 40px;
-  background: transparent;
-  color: #ffffff;
-  border: 1px solid #ffffff;
-  text-decoration: none;
+input[name="dates"], input[name="indicators"]{
+	display: none;
 }
 
-.modal-trigger {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  transition: ease .2s;
-} */
+label {
+	color: #bfbfbf;
+	display: inline-block;
+	padding: 0 0 0 1em;
+	cursor: pointer;
+}
 
-/* button {
-  border: 1px solid #333333;
-  outline: none;
-  color: #333333;
-} */
-/* 
-.modal-trigger:hover {
-  padding: 20px 60px;
-} */
+.labelDates:before {
+	content: '';
+	display: inline-block;
+	background: #55D8C6;
+	position: relative;
+	left: 0;
+	top: 5px;
+	height: 20px;
+	width: 20px;
+	margin-right: 5px;
+	border-radius: 80%;
+	box-shadow: 0px 1px 0 0 rgba(0, 0, 0, .2);
+	box-sizing: border-box;
+	border: 10px solid #fff;
+	transition: border .3s ease;
+}
+.labelIndicators:before {
+	content: '';
+	display: inline-block;
+	background: #898add;
+	position: relative;
+	left: 0;
+	top: 5px;
+	height: 20px;
+	width: 20px;
+	margin-right: 5px;
+	border-radius: 80%;
+	box-shadow: 0px 1px 0 0 rgba(0, 0, 0, .2);
+	box-sizing: border-box;
+	border: 10px solid #fff;
+	transition: border .3s ease;
+}
+
+
+input[name="dates"]:checked + .labelDates:before {
+	border-color: #fff;
+	border-width: 3px;
+}
+input[name="dates"] + .labelDates {
+	transition: color .7s ease;
+}
+input[name="dates"]:checked + .labelDates {
+	color: #5D5D5D;
+}
+
+input[name="indicators"]:checked + .labelIndicators:before {
+	border-color: #fff;
+	border-width: 3px;
+}
+input[name="indicators"] + .labelIndicators {
+	transition: color .7s ease;
+}
+input[name="indicators"]:checked + .labelIndicators {
+	color: #5D5D5D;
+}
+

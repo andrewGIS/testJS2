@@ -15,12 +15,13 @@
 	<link rel="stylesheet" href="css/modal.css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script type="text/javascript" src="https://js.arcgis.com/3.22/"></script>
+	<script type="text/javascript" src="https://js.arcgis.com/3.23/"></script>
 	
 	<!-- <script type="text/javascript" src="js/script.js"></script> -->
 	<script type="text/javascript" src="js/script_all.js"></script>
 	<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>-->
 	
+	<script type="text/javascript" src="js/elements.js"></script>
 	<script type="text/javascript" src="js/script_chart.js"></script>
 	<script type="text/javascript" src="js/utils_chart.js"></script>
 
@@ -140,23 +141,30 @@
 		<div class="modal-box">
 			<div class="modal-header">
 				<div class="close-modal">&#10006;</div>
-				<h1>Simple modal box</h1>
+				<h1>Дополнительная информация</h1>
 			</div>
 			<div class="modal-body">
-				<div id="container" style="width: 75%;">
+				<div id="container" style="width: 100%;">
 					<canvas id="modal-canvas"></canvas>
 				</div>
-				<div id="container2" style="width: 25%;">
+				<div id="divDates" style="width: 100%;">
 					<div>
-						<form>
+						<form id = "formDates">
+							<fieldset id="modal-listDates">
+							</fieldset>
+						</form>
+					</div>
+				</div>
+				<div id="divIndicators" style="width: 100%;">
+					<div>
+						<form id="formIndicator">
 							<fieldset id="modal-listIndicator">
 							</fieldset>
 						</form>
 					</div>
 				</div>
-				<button id="addDate">Добавить дату</button>
-				<button id="removeDate">Удалить дату</button>
 				<button id="recalcPDK">Пересчитать в ПДК</button>
+				<button id="toggleChart">Изменить тип графика</button>
 			</div>
 		</div>
 	</div>
