@@ -133,6 +133,9 @@ function loadModal(dataForChart) {
     colorNames = Object.keys(window.chartColors);
     targetCanvas = document.getElementById("modal-canvas").getContext("2d");
     firstElement = "ph";
+    $("#recalcPDK").html("Пересчитать в ПДК");
+    $("#toggleTable").html("Данные по расходам");
+    $("#recalcPDK").prop("disabled", false);
     if (dataForChart.length > 1) {
         $("#toggleTable").prop("disabled", false);
     }
@@ -381,6 +384,7 @@ function toggleTable() {
         color = Chart.helpers.color;
         colorNames = Object.keys(window.chartColors);
         firstElement = "rashod";
+        $("#recalcPDK").html("Пересчитать в ПДК");
         $("#toggleTable").html("Данные по элементам");
         $("#recalcPDK").prop("disabled", true);
         init();

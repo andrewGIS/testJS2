@@ -153,7 +153,7 @@ input[name="indicators"]:checked + .labelIndicators {
   background-color: transparent;
   border: 3px solid #fff;
   border-radius: 0.6em;
-  color: $red;
+  color:black;
   cursor: pointer;
   align-self: center;
   text-align: center;
@@ -165,4 +165,7 @@ input[name="indicators"]:checked + .labelIndicators {
 .modalButton:hover{
   color: #55D8C6;
   background-position: 0 100%;
+}
+.modalButton:disabled{
+  color: #666666;
 }
