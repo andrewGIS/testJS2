@@ -306,3 +306,7 @@ html, body {
 	background-color:rgba(80,80,80,0.7);
 	border-radius: 0px;
 }
+#container2{
+    position: relative;
+    float: right;
+}

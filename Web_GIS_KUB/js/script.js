@@ -186,5 +186,8 @@ require([
 			targetLay = map.getLayer(selectedContent[0][2]);			
 			targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);					
 		}
-	}		
+	}
+	
+	
+
 });
