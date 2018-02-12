@@ -134,7 +134,7 @@ function returnBlankTemplate() {
         },
         "ph": {
             "color": "",
-            "alias": "Кислотность",
+            "alias": "pH",
             "values": [],
             "limit": 0
         },
