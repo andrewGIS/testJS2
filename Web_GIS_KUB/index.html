@@ -106,12 +106,9 @@
 		<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;">
 			<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
 			<div id="pager">
-				<button id="previous" title="Предыдущий" style="height: 25px; width:45px;">
-					<img src="images/arrow_previous.png" style="width: 20px; height: 20px;">
-				</button>
-				<button id="next" title="Следующий" style="height: 25px; width:45px;">
-					<img src="images/arrow_next.png" style="width: 20px; height: 20px;">
-				</button>
+					<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;"><img src="images/arrow_previous.png" style="width: 20px; height: 20px;"></button>				 
+					<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;"><img src="images/arrow_next.png" style="width: 20px; height: 20px;"></button>
+					<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;"><img src="images/clear_select.png" style="width: 20px; height: 20px;"></button>
 			</div>
 			<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
 			<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">

@@ -1,6 +1,7 @@
 require([
 	"esri/config", "esri/map", "esri/layers/ArcGISTiledMapServiceLayer", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/WebTiledLayer", "esri/layers/FeatureLayer", "esri/layers/ArcGISImageServiceLayer", "esri/layers/ImageParameters", "esri/layers/RasterLayer",
 	"esri/SpatialReference", "esri/geometry/Extent", "esri/geometry/webMercatorUtils", "esri/InfoTemplate", "esri/Color", "esri/renderers/SimpleRenderer", "esri/geometry/Point",
+	"esri/graphic",
 	"esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleFillSymbol", "esri/symbols/SimpleLineSymbol",
 	"esri/tasks/query", "esri/tasks/QueryTask", "esri/tasks/RelationshipQuery", "esri/tasks/GeometryService",
 	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar",
@@ -8,6 +9,7 @@ require([
 	"esri/tasks/Geoprocessor",
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
 	"esri/tasks/GenerateRendererParameters", "esri/tasks/GenerateRendererTask",
+	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
 
 	"esri/TimeExtent", "esri/dijit/TimeSlider",
 	"dojo/_base/array",
@@ -21,6 +23,7 @@ require([
 ], function (
 	esriConfig, Map, ArcGISTiledMapServiceLayer, ArcGISDynamicMapServiceLayer, WebTiledLayer, FeatureLayer, ArcGISImageServiceLayer, ImageParameters, RasterLayer,
 	SpatialReference, Extent, webMercatorUtils, InfoTemplate, Color, SimpleRenderer, Point,
+	Graphic,
 	SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
 	Query, QueryTask, RelationshipQuery, GeometryService,
 	Measurement, Units, LayerList, Legend, Popup, PopupTemplate, HomeButton, OverviewMap, Scalebar,
@@ -28,6 +31,7 @@ require([
 	Geoprocessor,
 	ClassBreaksDefinition, AlgorithmicColorRamp,
 	GenerateRendererParameters, GenerateRendererTask,
+	IdentifyTask, IdentifyParameters,
 
 	TimeExtent, TimeSlider,
 	arrayUtils,
@@ -82,11 +86,11 @@ require([
 			Ediv4.id = "dijit_layout_ContentPane_4n";
 			mMeasure.startup();
 
-			// initFunctionallity();
+			initFunctionallity();
 
-			// assertClick();
+			assertClick();
 
-			// modalListener();
+			modalListener();
 
 
 		});
@@ -116,11 +120,11 @@ require([
 			outFields: ["*"],
 		});
 
-		var selectionSymbolPol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-			new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205, 10, 20, 1]), 2.5),
-			new Color([125, 125, 125, 0.5]));
-		RivBassLarge.setSelectionSymbol(selectionSymbolPol);
-		RivBassSmall.setSelectionSymbol(selectionSymbolPol);
+		// var selectionSymbolPol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+		// 	new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205, 10, 20, 1]), 2.5),
+		// 	new Color([125, 125, 125, 0.5]));
+		//RivBassLarge.setSelectionSymbol(selectionSymbolPol);
+		//RivBassSmall.setSelectionSymbol(selectionSymbolPol);
 
 		map.addLayers([ArcGISWTM, ArcGISWI, rosreestrMap, rosreestrMapAno, OSMMap, BaseMap]);
 		map.addLayers([DEMMap, TemMaps, BorderKUBMap, PollutionMap]);
@@ -311,7 +315,7 @@ require([
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
-				mapClick = map.on("click", mouseIdentObj);
+				mapClick = map.on("click", doIdentify);
 
 				// Изменение указателя мыши при наведении на идентифицируемый объект
 				RivBassSmall.on("mouse-over", cursorOver);
@@ -324,7 +328,7 @@ require([
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				mapClick.remove();
-				targetLay.clearSelection();
+				map.graphics.clear();
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
@@ -333,133 +337,19 @@ require([
 			}
 		});
 
-		// Вызов функций при нажатии кнопок в инфопанели при идентификации
-		on(dom.byId("next"), "click", clickNext);
-		on(dom.byId("previous"), "click", clickPrevious);
-		on(dom.byId("clearSelBut"), "click", clickClearSelBut);
 
 		// Функции для изменения указателя мыши при наведении на идентифицируемый объект
 		function cursorOver() { map.setMapCursor("help"); };
 		function cursorOut() { map.setMapCursor("default"); };
 
-		// Функции для кнопок отображения информации при выборе нескольких объектов на карте
-		function clickNext() {
-			if (iNumb < selectedContent.length - 1) {
-				targetLay.clearSelection();
-				iNumb = iNumb + 1;
-				queryLaySelect = new Query();
-				queryLaySelect.objectIds = [selectedContent[iNumb][1]];
-				targetLay = map.getLayer(selectedContent[iNumb][2]);
-				targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);
-				document.getElementById("rightPane").innerHTML = selectedContent[iNumb][0];
-			}
-		};
-
-		function clickPrevious() {
-			if (iNumb > 0) {
-				targetLay.clearSelection();
-				iNumb = iNumb - 1;
-				queryLaySelect = new Query();
-				queryLaySelect.objectIds = [selectedContent[iNumb][1]];
-				targetLay = map.getLayer(selectedContent[iNumb][2]);
-				targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);
-				registry.byId("rightPane").set("content", selectedContent[iNumb][0]);
-			}
-		}
-
 		//Функция для кнопки очистки выбранных объектов
-		function clickClearSelBut(){
+		function clickClearSelBut() {
 			document.getElementById('rightPane').innerHTML = '';
-			document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';		
-			targetLay.clearSelection();
+			document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+			map.graphics.clear();
 			document.getElementById('clearSelBut').style.display = 'none';
 			document.getElementById('previous').style.display = 'none';
 			document.getElementById('next').style.display = 'none';
-		}
-
-		//Функция идентификации объектов на карте
-		function mouseIdentObj(event) {
-			document.getElementById('rightPane').innerHTML = '';
-			iNumb = 0;
-			clickPnt = null;
-			targetLay = null;
-			selectedFeatures = null;
-			selectedContent = null;
-			queryLaySelect = null;			
-			var queryClick = new Query();		
-			clickPnt = new Point (event["mapPoint"]);
-			queryClick.geometry = clickPnt;					
-			RivBassLarge.selectFeatures(queryClick,RivBassLarge.SELECTION_NEW, function(e){
-				selectedFeatures = [];
-				selectedContent = [];					
-				selectedFeatures.push(e);
-				RivBassSmall.selectFeatures(queryClick,RivBassSmall.SELECTION_NEW, function(e){												
-					selectedFeatures.push(e);				
-					createContent();														
-				});										
-			});							
-					
-			function createContent(){
-				RivBassLarge.clearSelection();
-				RivBassSmall.clearSelection();			
-				if ((selectedFeatures[0].length>0) || (selectedFeatures[1].length>0)) {							
-					for (k=0; k<selectedFeatures[1].length; k++){
-						var getContent = "<table cellpadding='1'>" + 
-						"<tr><td class='tdGray'>Водоток: </td><td>" + selectedFeatures[1][k].attributes['name'] + "</td></tr>" +
-						"<tr><td class='tdGray'>Порядок водотока: </td><td>" + selectedFeatures[1][k].attributes['strahler_order'] + "</td></tr>" +		 
-						"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" + selectedFeatures[1][k].attributes['kub_thematic_data.sde.Watershad_small.area'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Средняя высота, м: </td><td>" + selectedFeatures[1][k].attributes['mean_height'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Расброс высот, м: </td><td>" + selectedFeatures[1][k].attributes['range_height'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Средний уклон, град: </td><td>" + selectedFeatures[1][k].attributes['mean_slope'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Густота речной сети по карте масштаба 1:1000000, км/кв.км: </td><td>" + selectedFeatures[1][k].attributes['stream_density_1000000'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Лесистость, %: </td><td>" + selectedFeatures[1][k].attributes['forest_percent'] + "</td></tr>" +  
-						"<tr><td class='tdGray'>Преобладающий тип леса: </td><td>" + selectedFeatures[1][k].attributes['foresttype'] + "</td></tr>" +
-						"<tr><td class='tdGray'>Озерность, %: </td><td>" + selectedFeatures[1][k].attributes['percent_lake'] + "</td></tr>" +
-						"<tr><td class='tdGray'>Закарстованность, % : </td><td>" + selectedFeatures[1][k].attributes['percent_karst'] + "</td></tr>" +
-						"<tr><td class='tdGray'>Заболоченность, %: </td><td>" + selectedFeatures[1][k].attributes['percent_wetland'] + "</td></tr>" +
-						"<tr><td class='tdGray'>Преобладающий тип почв: </td><td>" + selectedFeatures[1][k].attributes['soiltype'] + "</td></tr>" +
-						"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" + selectedFeatures[1][k].attributes['bedrock_type'] + "</td></tr>" +	
-						"</table>"					
-						selectedContent.push([getContent,selectedFeatures[1][k].attributes['objectid'],selectedFeatures[1][k]._layer.id]);										
-					}
-					for (l=0; l<selectedFeatures[0].length; l++){
-						var getContent = "<table cellpadding='1'>" + 
-						"<tr><td class='tdGray'>Водоток: </td><td>" + selectedFeatures[0][l].attributes['name'] + "</td></tr>" +		 
-						"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" + selectedFeatures[0][l].attributes['kub_thematic_data.sde.Watershad_large.area'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Средняя высота, м: </td><td>" + selectedFeatures[0][l].attributes['mean_height'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Расброс высот, м: </td><td>" + selectedFeatures[0][l].attributes['range_height'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Средний уклон, град: </td><td>" + selectedFeatures[0][l].attributes['mean_slope'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Густота речной сети по карте масштаба 1:1000000, км/кв.км: </td><td>" + selectedFeatures[0][l].attributes['stream_density_1000000'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Лесистость, %: </td><td>" + selectedFeatures[0][l].attributes['forest_percent'] + "</td></tr>" + 
-						"<tr><td class='tdGray'>Преобладающий тип леса: </td><td>" + selectedFeatures[0][l].attributes['foresttype'] + "</td></tr>" +		
-						"</table>"					
-						selectedContent.push([getContent,selectedFeatures[0][l].attributes['objectid'],selectedFeatures[0][l]._layer.id]);										
-					}
-					document.getElementById('featureCount').innerHTML = 'Выбрано объектов: ' + (selectedFeatures[0].length + selectedFeatures[1].length);
-					if ((selectedFeatures[0].length + selectedFeatures[1].length)>1){
-						document.getElementById('previous').style.display = 'block';
-						document.getElementById('next').style.display = 'block';
-					} else {
-						document.getElementById('previous').style.display = 'none';
-						document.getElementById('next').style.display = 'none';
-					}
-					fillContent();
-				} else {
-					document.getElementById('featureCount').innerHTML = 'Ничего не выбрано';
-					document.getElementById('clearSelBut').style.display = 'none';
-					document.getElementById('previous').style.display = 'none';
-					document.getElementById('next').style.display = 'none';				
-				}											
-			}
-			
-			function fillContent(){									
-				registry.byId("rightPane").set("content", selectedContent[0][0]);
-				queryLaySelect = new Query();
-				queryLaySelect.objectIds = [selectedContent[0][1]];			
-				targetLay = map.getLayer(selectedContent[0][2]);			
-				targetLay.selectFeatures(queryLaySelect, targetLay.SELECTION_NEW);
-				document.getElementById('clearSelBut').style.display = 'block';
-			}
 		}
 
 		// Отображение координат курсора мыши
@@ -496,18 +386,18 @@ require([
 					dom.byId("scale").innerHTML = levelAndScale[NumAr]
 				}
 			}
-        });
-        
+		});
 
-        function initFunctionallity() {
+
+		function initFunctionallity() {
 			//map.on("click", doIdentify);
 			identifyTask = new IdentifyTask("http://maps.psu.ru:8080/arcgis/rest/services/" +
 				"KUB/Pollution_KUB/MapServer");
 
 			identifyParams = new IdentifyParameters();
-			identifyParams.tolerance = 3;
-			identifyParams.layerIds = [0, 1, 2, 3, 4, 5, 6];
-			identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
+			identifyParams.tolerance = 5;
+			identifyParams.layerIds = [0, 1, 2, 3, 4, 5, 6, 8, 10, 13, 14];
+			identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
 			identifyParams.width = map.width;
 			identifyParams.height = map.height;
 
@@ -519,6 +409,7 @@ require([
 
 			//map.graphics.clear();
 			identifyParams.geometry = event.mapPoint;
+			identifyParams.returnGeometry = true;
 			identifyParams.mapExtent = map.extent;
 			identifyTask.execute(identifyParams, function (idResults) {
 				//addToMap(idResults, event);
@@ -534,9 +425,10 @@ require([
 
 				selectedInfoNumber = 0;
 
+
 				loadResults(selectedInfoNumber);
 
-				document.getElementById("featureCount").innerHTML = "Выбрано объектов: " + identifyResults.length;
+
 
 			});
 
@@ -559,22 +451,26 @@ require([
 			//let currentContent = "<b>" + currentObject.layerName + "</b><br/>"
 
 			let currentContent = "<table cellpadding='1'>"
-			currentContent += "<tr><td class='tdGray'>Слой: </td><td>" +
-				currentObject.layerName + "</td></tr>" +
-				"<tr><td class='tdGray'>OBJECTID: </td><td>" +
-				currentObject.feature.attributes.OBJECTID + "</td></tr>"
-			// 	"<tr><td class='tdGray'>Порядок водотока: </td><td>" +
-			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-			// 	"<tr><td class='tdGray'>Площадь, кв. км: </td><td>" +
-			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-			// 	"<tr><td class='tdGray'>Преобладающая почвообразующая порода: </td><td>" +
-			// 	currentObject.feature.attributes.OBJECTID + "</td></tr>" +
-			// 	"<tr><td class='tdGray'></td><td>" 
-			currentContent += "<td><tr><button id = 'addInfo'> Доп.информация </button></td></tr></table>"
-			// if currentObject.layer
-			// 
-			//currentContent +='<button id = "addInfo"> Доп. </a></button>'
 
+			currentContent += "<tr><td class='tdGray'>Слой: </td><td>" +
+				currentObject.layerName + "</td></tr>"
+
+			$.each(currentObject.feature.attributes, function (key, value) {
+				if (key !== "OBJECTID" && key !== "Shape" && key !== "objectid") {
+					currentContent += "<tr><td class='tdGray'>" + key + "</td><td>" +
+						value + "</td></tr>"
+				}
+
+			});
+
+			if (currentObject.layerId === 2 ||
+				currentObject.layerId === 3 ||
+				currentObject.layerId === 4 ||
+				currentObject.layerId === 5 ) {
+				currentContent += "<tr><td><button id = 'addInfo'> Доп.информация </button></td></tr>"
+			}
+
+			currentContent += "</table>"
 
 			return currentContent
 			//return infoTemplate;
@@ -588,7 +484,30 @@ require([
 			registry.byId("rightPane").set("content",
 				createTable(identifyResults[number]));
 
-			on(dom.byId("addInfo"), "click", showAddInfo);
+			// load first time
+			if (number == 0) {
+				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
+					" ( " + 1  + " из " + identifyResults.length + " )");
+				map.graphics.clear();
+				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
+					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)))
+			}
+
+			// add graphic of selected feature (with pre-selecting symbol)
+
+
+			$('#clearSelBut').show();
+			$('#previous').show();
+			$('#next').show();
+
+			// exception when button don't exist
+			try {
+				on(dom.byId("addInfo"), "click", showAddInfo);
+			} catch (error) {
+				console.log("Кнопка не создана");
+				console.log(error);
+			}
+
 			//on(dom.byId("addInfo"), "click", loadModal);
 
 		}
@@ -597,18 +516,24 @@ require([
 		function assertClick() {
 			on(dom.byId("next"), "click", nextClick);
 			on(dom.byId("previous"), "click", previousClick);
+			on(dom.byId("clearSelBut"), "click", clickClearSelBut);
 		}
 
 		// next click
 
 		function nextClick() {
 			try {
-
 				loadResults(selectedInfoNumber + 1);
 				selectedInfoNumber = selectedInfoNumber + 1;
+				map.graphics.clear();
+				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
+					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)));
+				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
+					" ( " + (selectedInfoNumber + 1)  + " из " + identifyResults.length + " )");
+
 
 			} catch (error) {
-				// console.log(error)
+				console.log(error)
 				console.log("Дошли до конца")
 			}
 			finally {
@@ -620,12 +545,19 @@ require([
 
 		function previousClick() {
 			try {
-
 				loadResults(selectedInfoNumber - 1);
-				selectedInfoNumber = selectedInfoNumber - 1
+				selectedInfoNumber = selectedInfoNumber - 1;
+				map.graphics.clear();
+				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
+					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)));
+				
+				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
+					" ( " + (selectedInfoNumber + 1)   + " из " + identifyResults.length + " )");
+
+
 
 			} catch (error) {
-				//console.log(error)
+				console.log(error)
 				console.log("Дошли до начала")
 			}
 			finally {
@@ -633,11 +565,6 @@ require([
 			}
 		}
 
-		// query related features for selected object
-		// make parameter as layer
-		// check async
-		// need to create of list neccessary 
-		//relatedQuery.outFields = [];
 
 		function showAddInfo() {
 
@@ -723,5 +650,23 @@ require([
 
 
 		}
+
+
+		function setSelectionSymbol(typeGeometry) {
+			// set point symbol
+			switch (typeGeometry) {
+				case "point":
+					var markerSymbol = new SimpleMarkerSymbol();
+					markerSymbol.setPath("M16,4.938c-7.732,0-14,4.701-14,10.5c0,1.981,0.741,3.833,2.016,5.414L2,25.272l5.613-1.44c2.339,1.316,5.237,2.106,8.387,2.106c7.732,0,14-4.701,14-10.5S23.732,4.938,16,4.938zM16.868,21.375h-1.969v-1.889h1.969V21.375zM16.772,18.094h-1.777l-0.176-8.083h2.113L16.772,18.094z");
+					markerSymbol.setColor(new Color("#00FFFF"));
+					return markerSymbol;
+
+				case "polygon":
+					return new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
+						new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205, 10, 20, 1]), 2.5),
+						new Color([125, 125, 125, 0.5]));
+			}
+		}
+
 
 	});
