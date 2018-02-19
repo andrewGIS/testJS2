@@ -440,17 +440,11 @@ require([
 
 			if (currentObject == "No results") {
 
-				return "No results"
+				return "Ничего не выбрано"
 			}
 
-			//console.log(currentObject);
 
-			//let infoTemplate = new InfoTemplate(currentObject.layerName, "${*}","Hellow");
-
-
-			//let currentContent = "<b>" + currentObject.layerName + "</b><br/>"
-
-			let currentContent = "<table cellpadding='1'>"
+			var currentContent = "<table cellpadding='1'>"
 
 			currentContent += "<tr><td class='tdGray'>Слой: </td><td>" +
 				currentObject.layerName + "</td></tr>"
@@ -473,7 +467,6 @@ require([
 			currentContent += "</table>"
 
 			return currentContent
-			//return infoTemplate;
 		}
 
 
@@ -569,10 +562,6 @@ require([
 		function showAddInfo() {
 
 			//console.log(identifyResults[selectedInfoNumber])
-
-			//alert(identifyResults[selectedInfoNumber].feature.attributes.OBJECTID)
-
-			//console.log(map.layerIds)
 
 			let layerID = identifyResults[selectedInfoNumber].layerId
 
