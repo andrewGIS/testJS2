@@ -96,9 +96,10 @@ html, body {
 	position: absolute;	
     top: 80px;
 	right: 40px;
-	bottom: 0px;	
+	bottom: 20px;	
 	z-index: 50;		
 	border-radius: 0px;
+	overflow-y: auto;
 	display: none;
 }
 #BaseMapChange{
@@ -161,6 +162,21 @@ html, body {
 	border-width: 1px;
 	background-color: #000666;
 	background-color: rgba(102,102,102,0.80);
+}
+#PhotosBut{
+	position: absolute;
+    top: 204px;
+    left: 0px;
+    z-index: 50;
+	padding: 2px;
+	height: 40px;
+	width: 40px;
+	border-radius: 0px;
+	border-color: rgba(102,102,102,0.80);
+	border-style: solid;
+	border-width: 1px;
+	background-color: #000666;
+	background-color: rgba(102,102,102,0.80);	
 }
 .esriLayerList .esriContainer {
 	background-color: #FFFFFF;
