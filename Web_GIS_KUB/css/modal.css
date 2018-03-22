@@ -86,7 +86,7 @@ input[name="dates"], input[name="indicators"]{
 	display: none;
 }
 
-label {
+.labelIndicators, .labelDates {
 	color: #bfbfbf;
 	display: inline-block;
 	padding: 0 0 0 1em;

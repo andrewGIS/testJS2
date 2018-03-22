@@ -60,13 +60,13 @@ require([
 		var mapClick;
 		var clickPnt;
 		var selectedContent;
-		var selectedFeatures;
-		var targetLay;
+		var selectedFeatures;		
 		var iNumb;
 		var queryLaySelect;
 		var selectedInfoNumber;
 		var identifyResult;
-		var identifyTask, identifyParams;
+		var identifyTask, identifyParams;				
+		var massPointLabels = ["Отвалы", "Изливы", "Родники"];
 
 		map.on('load', function (results) {
 			mMeasure = new Measurement({
@@ -96,12 +96,8 @@ require([
 		});
 
 		//добавление сервисов
-		var BaseMap = new ArcGISTiledMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Base_Map/MapServer");
-		//var RivBassMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins_KUB/MapServer");
-		var PollutionMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer");
-		var BorderKUBMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Borders_KUB/MapServer");
-		var DEMMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/DEM20m_KUB/MapServer");
-		var TemMaps = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Thematic_maps/MapServer");
+		var BaseMap = new ArcGISTiledMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Base_Map/MapServer");		
+		var PollutionMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer");		
 
 		var OSMMap = new WebTiledLayer("http://c.tile.openstreetmap.org/${level}/${col}/${row}.png", {
 			"copyright": 'Map data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -113,12 +109,12 @@ require([
 		var ArcGISWI = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer");
 		var ArcGISWTM = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer");
 
-		var RivBassSmall = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/0", {
+		/*var RivBassSmall = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/0", {
 			outFields: ["*"],
 		});
 		var RivBassLarge = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/1", {
 			outFields: ["*"],
-		});
+		});*/
 
 		// var selectionSymbolPol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
 		// 	new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205, 10, 20, 1]), 2.5),
@@ -127,16 +123,13 @@ require([
 		//RivBassSmall.setSelectionSymbol(selectionSymbolPol);
 
 		map.addLayers([ArcGISWTM, ArcGISWI, rosreestrMap, rosreestrMapAno, OSMMap, BaseMap]);
-		map.addLayers([DEMMap, TemMaps, BorderKUBMap, PollutionMap]);
-		map.addLayers([RivBassSmall, RivBassLarge]);
-
+		map.addLayers([PollutionMap]);
+		
 		rosreestrMap.hide();
 		rosreestrMapAno.hide();
 		ArcGISWI.hide();
 		ArcGISWTM.hide();
-		DEMMap.hide();
-		DEMMap.setOpacity(0.65);
-		RivBassSmall.setMinScale(1200000);
+				
 
 		var overviewMapDijit = new OverviewMap({
 			map: map,
@@ -163,27 +156,11 @@ require([
 			map: map,
 			showLegend: true,
 			showSubLayers: true,
-			showOpacitySlider: false,
-			layers: [{
-				layer: TemMaps,
-				title: "Тематические карты"
-			}, {
-				layer: RivBassLarge,
-				title: "Бассейны средних рек"
-			}, {
-				layer: RivBassSmall,
-				title: "Бассейны малых рек"
-			}, {
-				layer: DEMMap,
-				title: "Цифровая модель рельефа (разр. 20м.)"
-			}, {
-				layer: BorderKUBMap,
-				title: "Границы"
-			}, {
+			showOpacitySlider: false,			
+			layers: [{				
 				layer: PollutionMap,
-				title: "Загрязнение"
-			}
-			],
+				title: "Слои"
+			}],
 		}, "layerListDom");
 		layerList.startup();
 
@@ -232,13 +209,11 @@ require([
 				document.getElementById('map').style.right = '40px';
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();
-				targetLay.clearSelection();
+				mapClick.remove();				
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				RivBassSmall.on("mouse-over", cursorOut);
-				RivBassLarge.on("mouse-over", cursorOut);
+				cursorOut();				
 			} else {
 				dom.byId('layerListDom').style.display = 'none';
 			}
@@ -258,13 +233,11 @@ require([
 				document.getElementById('map').style.right = '40px';
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();
-				targetLay.clearSelection();
+				mapClick.remove();				
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				RivBassSmall.on("mouse-over", cursorOut);
-				RivBassLarge.on("mouse-over", cursorOut);
+				cursorOut();				
 			} else {
 				dom.byId('caseTitlePaneBM').style.display = 'none';
 			}
@@ -281,12 +254,11 @@ require([
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				mapClick.remove();
-				targetLay.clearSelection();
+				cursorOut();				
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				RivBassSmall.on("mouse-over", cursorOut);
-				RivBassLarge.on("mouse-over", cursorOut);
+								
 			} else {
 				dom.byId('dMeasurePane').style.display = 'none';
 				destroyMeasure();
@@ -316,12 +288,7 @@ require([
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
 				mapClick = map.on("click", doIdentify);
-
-				// Изменение указателя мыши при наведении на идентифицируемый объект
-				RivBassSmall.on("mouse-over", cursorOver);
-				RivBassSmall.on("mouse-out", cursorOut);
-				RivBassLarge.on("mouse-over", cursorOver);
-				RivBassLarge.on("mouse-out", cursorOut);
+				cursorOver();								
 			} else {
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
@@ -332,13 +299,11 @@ require([
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				RivBassSmall.on("mouse-over", cursorOut);
-				RivBassLarge.on("mouse-over", cursorOut);
+				cursorOut();				
 			}
 		});
 
-
-		// Функции для изменения указателя мыши при наведении на идентифицируемый объект
+		// Функции для изменения указателя мыши
 		function cursorOver() { map.setMapCursor("help"); };
 		function cursorOut() { map.setMapCursor("default"); };
 
@@ -391,12 +356,11 @@ require([
 
 		function initFunctionallity() {
 			//map.on("click", doIdentify);
-			identifyTask = new IdentifyTask("http://maps.psu.ru:8080/arcgis/rest/services/" +
-				"KUB/Pollution_KUB/MapServer");
+			identifyTask = new IdentifyTask("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer");
 
 			identifyParams = new IdentifyParameters();
 			identifyParams.tolerance = 5;
-			identifyParams.layerIds = [0, 1, 2, 3, 4, 5, 6, 8, 10, 13, 14];
+			identifyParams.layerIds = [4, 5, 6, 7, 8, 9, 10, 12, 14, 17, 20, 23, 24, 26];
 			identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
 			identifyParams.width = map.width;
 			identifyParams.height = map.height;
@@ -457,11 +421,17 @@ require([
 
 			});
 
-			if (currentObject.layerId === 2 ||
-				currentObject.layerId === 3 ||
-				currentObject.layerId === 4 ||
-				currentObject.layerId === 5 ) {
+			if (currentObject.layerId === 6 ||
+				currentObject.layerId === 7 ||
+				currentObject.layerId === 8 ||
+				currentObject.layerId === 9) {
 				currentContent += "<tr><td><button id = 'addInfo'> Доп.информация </button></td></tr>"
+			}
+
+			if (currentObject.layerId === 23 ||
+				currentObject.layerId === 24) {
+				currentContent += "<tr><td colspan='2' style='text-align:center;'>Источники загрязнения</td></tr>"
+				currentContent += "<tr><td colspan='2'><canvas id='chart-area' width='230px' height='230px'></canvas></td></tr>"
 			}
 
 			currentContent += "</table>"
@@ -469,6 +439,57 @@ require([
 			return currentContent
 		}
 
+		function PrepareDataForPieChart(geometry) {
+			var IdsLyrForQuery = ["5", "6", "7"];			
+			Promise.all(IdsLyrForQuery.map(function (element) {
+				var urlLayerQuery = "http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" + element;
+				var qt = new QueryTask(urlLayerQuery);
+				var queryParams = new Query();
+				queryParams.returnGeometry = false;
+				queryParams.outFields = ["objectid"];
+				queryParams.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
+				queryParams.geometry = geometry;
+				return qt.execute(queryParams, function (results) {
+					console.log(results);
+					console.log(results.features.length);
+					return results;					
+				});					
+			})).then(values => CreatePieChart(values.map(function(e){
+				return e.features.length})));
+		}
+
+		//create new pie diagram with pollution points statistics in bassins
+
+		function CreatePieChart(data) {
+			var config = {
+				type: 'pie',
+				data: {
+					datasets: [{
+						data: data,
+						backgroundColor: [
+							window.chartColors.orange,
+							window.chartColors.yellow,
+							window.chartColors.blue,
+						],
+						label: 'Dataset 1'
+					}],
+					labels: massPointLabels
+				},
+				options: {
+					responsive: true,
+					legend:{
+						display: true,
+						position: 'bottom',
+						labels: {
+							boxWidth: 20
+						}
+					}										
+				}
+			};
+
+			var ctx = document.getElementById("chart-area").getContext("2d");
+			var myPie = new Chart(ctx, config);
+		}
 
 		//load identify results to dom element
 
@@ -476,11 +497,12 @@ require([
 
 			registry.byId("rightPane").set("content",
 				createTable(identifyResults[number]));
+				PrepareDataForPieChart(identifyResults[number].feature.geometry);				
 
 			// load first time
 			if (number == 0) {
 				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
-					" ( " + 1  + " из " + identifyResults.length + " )");
+					" ( " + 1 + " из " + identifyResults.length + " )");
 				map.graphics.clear();
 				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
 					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)))
@@ -522,7 +544,7 @@ require([
 				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
 					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)));
 				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
-					" ( " + (selectedInfoNumber + 1)  + " из " + identifyResults.length + " )");
+					" ( " + (selectedInfoNumber + 1) + " из " + identifyResults.length + " )");
 
 
 			} catch (error) {
@@ -543,9 +565,9 @@ require([
 				map.graphics.clear();
 				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
 					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)));
-				
+
 				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
-					" ( " + (selectedInfoNumber + 1)   + " из " + identifyResults.length + " )");
+					" ( " + (selectedInfoNumber + 1) + " из " + identifyResults.length + " )");
 
 
 
