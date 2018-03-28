@@ -132,6 +132,8 @@ function init() {
     });
     
 
+    11
+
     createCheckboxesIndicator(indicatorsValues);
     createCheckboxesDates(dateValues);
 
