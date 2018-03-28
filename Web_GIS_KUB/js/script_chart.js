@@ -112,9 +112,25 @@ function init() {
                 text: charTitle,
                 fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                 fontSize: 16
+            },
+            scales: {
+                yAxes: [{
+                    type: 'logarithmic',
+                    ticks: {
+                        callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
+                            return value.toFixed(3);//pass tick values as a string into Number function
+                        }
+                    },
+                    afterBuildTicks: function (axe) {
+                        console.log(axe.max);
+                        let labelsCount = 3;
+                        axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
+                    }
+                }]
             }
         }
     });
+    
 
     createCheckboxesIndicator(indicatorsValues);
     createCheckboxesDates(dateValues);
@@ -367,6 +383,21 @@ function toggleChart() {
             title: {
                 display: true,
                 text: charTitle
+            },
+            scales: {
+                yAxes: [{
+                    type: 'logarithmic',
+                    ticks: {
+                        callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
+                            return value.toFixed(3);//pass tick values as a string into Number function
+                        }
+                    },
+                    afterBuildTicks: function (axe) {
+                        console.log(axe.max);
+                        let labelsCount = 3;
+                        axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
+                    }
+                }]
             }
         }
     });
@@ -374,7 +405,7 @@ function toggleChart() {
 
 function toggleTable() {
     //console.log(dataForChartRaw[1])
-    if (document.getElementById("toggleTable").innerHTML == "Данные по расходам"){
+    if (document.getElementById("toggleTable").innerHTML == "Данные по расходам") {
         myBar.destroy();
         document.getElementById("modal-listDates").innerHTML = "";
         document.getElementById("modal-listIndicator").innerHTML = "";
@@ -390,7 +421,7 @@ function toggleTable() {
         init();
 
     }
-    else{
+    else {
         $("#toggleTable").html("Данные по расходам");
         myBar.destroy();
         document.getElementById("modal-listDates").innerHTML = "";
@@ -399,4 +430,22 @@ function toggleTable() {
         loadModal(dataForChartRaw);
     }
 
+}
+
+function range(start, edge, step) {
+    // If only one number was passed in make it the edge and 0 the start.
+    if (arguments.length == 1) {
+        edge = start;
+        start = 0;
+    }
+
+    // Validate the edge and step numbers.
+    edge = edge || 0;
+    step = step || 1;
+
+    // Create the array of numbers, stopping befor the edge.
+    for (var ret = []; (edge - start) * step > 0; start += step) {
+        ret.push(start);
+    }
+    return ret;
 }
