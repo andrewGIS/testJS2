@@ -13,7 +13,8 @@
 	<link rel="stylesheet" href="https://js.arcgis.com/3.22/dgrid/css/dgrid.css">
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/modal.css">
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>
+	<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>-->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://js.arcgis.com/3.23/"></script>
 	
@@ -25,6 +26,7 @@
 	<script type="text/javascript" src="js/elements.js"></script>
 	<script type="text/javascript" src="js/script_chart.js"></script>
 	<script type="text/javascript" src="js/utils_chart.js"></script>
+	<script type="text/javascript" src="js/chartjs-plugin-annotation.js"></script>
 
 </head>
 
@@ -166,7 +168,8 @@
 				</div>
 				<button id="recalcPDK" class = "modalButton">Пересчитать в ПДК</button>
 				<button id="toggleChart" class = "modalButton">Изменить тип графика</button>
-				<button id="toggleTable" class = "modalButton" disabled>Данные по расходам</button>
+				<button id="showElements" class = "modalButton" disabled>Данные по элементам</button>
+				<button id="showFlowRate" class = "modalButton" disabled>Данные по расходам</button>
 			</div>
 		</div>
 	</div>

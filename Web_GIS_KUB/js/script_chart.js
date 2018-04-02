@@ -10,6 +10,9 @@ var charTitle;
 var color;// variable from samples with charts
 var colorNames;// variable from samples with charts
 var dataForChartRaw;// variable from samples with charts
+var currentLyrID; // source layer , used for choose necessary pdk limit
+var limitLine;// variable for store limit pdk value when only one indicator on graph
+// // var limitLine;// variable for store limit pdk value when only one indicator on graph
 
 
 function modalListener() {
@@ -19,7 +22,8 @@ function modalListener() {
         $('#modal-canvas').remove();
         $('#container').append('<canvas id="modal-canvas"><canvas>');
         $("#recalcPDK").off();
-        $("#toggleChart").off();
+        $("#showElements").off();
+        $("#showFlowRate").off();
         $("#modal-listIndicator").off();
         $("#modal-listDates").off();
         $(".modal").css({ "display": "none" });
@@ -32,7 +36,8 @@ function modalListener() {
     // listener for buttons
     document.getElementById("recalcPDK").addEventListener('click', recalcPDK);
     document.getElementById("toggleChart").addEventListener('click', toggleChart);
-    document.getElementById("toggleTable").addEventListener('click', toggleTable);
+    document.getElementById("showElements").addEventListener('click', toggleTable);
+    document.getElementById("showFlowRate").addEventListener('click', toggleTable);
 
 
     // listener for checkbox of indicators
@@ -85,6 +90,20 @@ function init() {
     // create data for Chart and show modal window and create check boxes
     $("#modal-name").css({ "display": "block" });
 
+    // set limitLine
+    limitLine = [{
+        type: 'line',
+        mode: 'horizontal',
+        scaleID: 'y-axis-0',
+        value: indicatorsValues[firstElement]['limit'][0],
+        borderWidth: 5,
+        label: {
+            backgroundColor: "red",
+            content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][0] + ")",
+            enabled: true
+        }
+    }];
+
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
         datasets: [{
@@ -115,6 +134,10 @@ function init() {
             },
             scales: {
                 yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Значение показателя'
+                    },
                     type: 'logarithmic',
                     ticks: {
                         callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
@@ -122,17 +145,24 @@ function init() {
                         }
                     },
                     afterBuildTicks: function (axe) {
-                        console.log(axe.max);
                         let labelsCount = 3;
                         axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
+
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Даты'
                     }
                 }]
+
+            },
+            annotation: {
+                annotations: limitLine
             }
         }
     });
-    
-
-    11
 
     createCheckboxesIndicator(indicatorsValues);
     createCheckboxesDates(dateValues);
@@ -140,8 +170,9 @@ function init() {
 
 }
 
-function loadModal(dataForChart) {
+function loadModal(dataForChart, layerID) {
     // calc variable for each record
+    currentLyrID = layerID;
     chartType = 'bar';
     dataForChartRaw = dataForChart;
     indicatorsValues = pushElementsValues(dataForChart[0], 1);
@@ -152,14 +183,15 @@ function loadModal(dataForChart) {
     targetCanvas = document.getElementById("modal-canvas").getContext("2d");
     firstElement = "ph";
     $("#recalcPDK").html("Пересчитать в ПДК");
-    $("#toggleTable").html("Данные по расходам");
     $("#recalcPDK").prop("disabled", false);
+    $("#showElements").prop("disabled", false);
     if (dataForChart.length > 1) {
-        $("#toggleTable").prop("disabled", false);
+        $("#showFlowRate").prop("disabled", false);
     }
     else {
-        $("#toggleTable").prop("disabled", true);
+        $("#showFlowRate").prop("disabled", true);
     }
+
     init();
 
 }
@@ -227,6 +259,8 @@ function removeIndicator(indicatorName) {
             barChartData.datasets.splice(index, 1);
         }
     }
+
+    setLine();
     myBar.update();
 };
 
@@ -303,12 +337,18 @@ function addIndicator(indicatorName) {
     };
 
     barChartData.datasets.push(newDataset);
+    setLine();
+
     myBar.update();
 };
 
 function recalcPDK() {
     // recalc data in pdk value (pdk must be setted in elements)
+    //console.log(currentLyrID);
     if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в ПДК") {
+
+        // clear limit line
+        myBar.chart.annotation.options.annotations.pop();
 
         document.getElementById("recalcPDK").innerHTML = "Вернуть значения";
 
@@ -322,7 +362,7 @@ function recalcPDK() {
 
                     if (name == indicatorsValues[indicator]['alias']) {
 
-                        return value / indicatorsValues[indicator]['limit'];
+                        return value / indicatorsValues[indicator]['limit'][limitNumber()];
                     }
                 }
             });
@@ -330,6 +370,8 @@ function recalcPDK() {
         });
     } else {
         document.getElementById("recalcPDK").innerHTML = "Пересчитать в ПДК";
+
+        setLine();
 
         barChartData.datasets.forEach(function (dataset) {
 
@@ -388,6 +430,10 @@ function toggleChart() {
             },
             scales: {
                 yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Значение показателя'
+                    },
                     type: 'logarithmic',
                     ticks: {
                         callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
@@ -399,7 +445,16 @@ function toggleChart() {
                         let labelsCount = 3;
                         axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
                     }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Даты'
+                    }
                 }]
+            },
+            annotation: {
+                annotations: limitLine
             }
         }
     });
@@ -407,7 +462,7 @@ function toggleChart() {
 
 function toggleTable() {
     //console.log(dataForChartRaw[1])
-    if (document.getElementById("toggleTable").innerHTML == "Данные по расходам") {
+    if (this.id == "showFlowRate") {
         myBar.destroy();
         document.getElementById("modal-listDates").innerHTML = "";
         document.getElementById("modal-listIndicator").innerHTML = "";
@@ -417,14 +472,11 @@ function toggleTable() {
         color = Chart.helpers.color;
         colorNames = Object.keys(window.chartColors);
         firstElement = "rashod";
-        $("#recalcPDK").html("Пересчитать в ПДК");
-        $("#toggleTable").html("Данные по элементам");
         $("#recalcPDK").prop("disabled", true);
         init();
 
     }
     else {
-        $("#toggleTable").html("Данные по расходам");
         myBar.destroy();
         document.getElementById("modal-listDates").innerHTML = "";
         document.getElementById("modal-listIndicator").innerHTML = "";
@@ -450,4 +502,59 @@ function range(start, edge, step) {
         ret.push(start);
     }
     return ret;
+}
+
+function limitNumber() {
+    //return index of list which limit will be used
+    // need to use different pdk value for different layers
+    let indexOfList = (currentLyrID == 6 ||
+        currentLyrID == 7) ? 0 : 1
+    return indexOfList;
+}
+
+function setLine() {
+    if (myBar.chart.config.data.datasets.length == 1) {
+
+        let currentIndicatorAlias = myBar.chart.config.data.datasets[0].label
+        let elements = returnBlankTemplate();
+        let pdkValue;
+        $.each(elements, function (key, value) {
+            if (elements[key]['alias'] == currentIndicatorAlias) {
+                pdkValue = elements[key]['limit'][limitNumber()];
+            };
+        });
+
+        // if PDK is not defined 
+        if (pdkValue == 0) {
+            pdkValue = NaN;
+        }
+
+
+        if (pdkValue > Math.max.apply(null, myBar.chart.data.datasets[0].data)) {
+            //myBar.chart.scales['y-axis-0'].max = pdkValue + 0.2*pdkValue;
+            //myBar.chart.scales['y-axis-0'].ticks.max = pdkValue + 0.2 * pdkValue;
+            //myBar.update();
+        }
+
+        //myBar.chart.annotation.options.annotations[0].value = pdkValue;
+        myBar.chart.annotation.options.annotations[0] = {
+            drawTime: 'afterDatasetsDraw',
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-0',
+            value: pdkValue,
+            borderWidth: 5,
+            label: {
+                backgroundColor: "red",
+                content: "Значение ПДК (" + pdkValue + ")",
+                enabled: true,
+                position: "center",
+                // for showing label in chart
+                yAdjust: Math.max.apply(null, myBar.chart.data.datasets[0].data) - pdkValue > 0 ? -10 : 10,
+            }
+        }
+    }
+    else {
+        myBar.chart.annotation.options.annotations.pop();
+    }
 }
