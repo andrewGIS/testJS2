@@ -22,9 +22,6 @@ function modalListener() {
         $('#modal-canvas').remove();
         $('#container').empty();
         $('#container').append('<canvas id="modal-canvas"><canvas>');
-        // $("#recalcPDK").off();
-        // $("#showElements").off();
-        // $("#showFlowRate").off();
         $(".modal").css({ "display": "none" });
         $("#addInfo").off();
         $("#toggleTable").off();
@@ -42,7 +39,6 @@ function modalListener() {
 
     // listener for buttons
     $("#recalcPDK").on('click', recalcPDK);
-    $("#toggleChart").on('click', toggleChart);
     $("#showElements").on('click', toggleTable);
     $("#showFlowRate").on('click', toggleTable);
 
@@ -70,6 +66,7 @@ function init() {
         scaleID: 'y-axis-0',
         value: indicatorsValues[firstElement]['limit'][0],
         borderWidth: 5,
+        borderColor: 'red',
         label: {
             backgroundColor: "red",
             content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][0] + ")",
@@ -400,6 +397,9 @@ function addIndicator(indicatorName) {
 function recalcPDK() {
     // recalc data in pdk value (pdk must be setted in elements)
     //console.log(currentLyrID);
+
+    // need to add only checked dates
+
     if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в ПДК") {
 
         // clear limit line
@@ -462,57 +462,6 @@ function pushElementsValues(ObjectForFill, index) {
 
     }
     return elements
-}
-
-function toggleChart() {
-    // toggle type of chart
-    myBar.destroy();
-    //change chart type: 
-    chartType = (myBar.config.type == 'bar') ? 'line' : 'bar';
-    //restart chart:
-    myBar = new Chart(targetCanvas, {
-        type: chartType,
-        data: barChartData,
-        options: {
-            responsive: true,
-            legend: {
-                position: 'top',
-                onClick: (e) => e.stopPropagation()
-            },
-            title: {
-                display: true,
-                text: charTitle
-            },
-            scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Значение показателя'
-                    },
-                    type: 'logarithmic',
-                    ticks: {
-                        callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
-                            return value.toFixed(3);//pass tick values as a string into Number function
-                        }
-                    },
-                    afterBuildTicks: function (axe) {
-                        //console.log(axe.max);
-                        let labelsCount = 3;
-                        axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
-                    }
-                }],
-                xAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Даты'
-                    }
-                }]
-            },
-            annotation: {
-                annotations: limitLine
-            }
-        }
-    });
 }
 
 function toggleTable() {
@@ -618,6 +567,7 @@ function setLine() {
             scaleID: 'y-axis-0',
             value: pdkValue,
             borderWidth: 5,
+            borderColor: 'red',
             label: {
                 backgroundColor: "red",
                 content: "Значение ПДК (" + pdkValue + ")",

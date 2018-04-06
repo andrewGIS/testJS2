@@ -9,56 +9,56 @@ function returnBlankTemplate() {
             "class": "micro"
         },
         "co": {
-            "color": "",
+            "color": "rgb(255,255,0)",
             "alias": "CO",
             "values": [],
             "limit": [0.1, 0.01],
             "class": "micro"
         },
         "be": {
-            "color": "",
+            "color": "rgb(5,110,0)",
             "alias": "Be",
             "values": [],
             "limit": [0.0002, 0.0003],
             "class": "micro"
         },
         "ai": {
-            "color": "",
+            "color": "rgb(0,48,0)",
             "alias": "AI",
             "values": [],
             "limit": [0, 0],
             "class": "micro"
         },
         "pb": {
-            "color": "",
+            "color": "rgb(0,0,75)",
             "alias": "Pb",
             "values": [],
             "limit": [0.01, 0.006],
             "class": "micro"
         },
         "hco3": {
-            "color": "",
+            "color": "rgb(0,0,50)",
             "alias": "HCO3",
             "values": [],
             "limit": [0, 0],
             "class": "macro"
         },
         "cd": {
-            "color": "",
+            "color": "rgb(100,0,0)",
             "alias": "Cd",
             "values": [],
             "limit": [0.001, 0.005],
             "class": "micro"
         },
         "nh4": {
-            "color": "",
+            "color": "rgb(0,100,0)",
             "alias": "NH4",
             "values": [],
             "limit": [1.5, 0.5],
             "class": "macro"
         },
         "fe": {
-            "color": "",
+            "color": "rgb(0,0,200)",
             "alias": "Fe",
             "values": [],
             "limit": [0.3, 0.1],
