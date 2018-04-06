@@ -5,151 +5,176 @@ function returnBlankTemplate() {
             "color": "rgb(255,0,0)",
             "alias": "CI",
             "values": [],
-            "limit": [0, 0]
+            "limit": [0, 0],
+            "class": "micro"
         },
         "co": {
             "color": "",
             "alias": "CO",
             "values": [],
-            "limit": [0.1, 0.01]
+            "limit": [0.1, 0.01],
+            "class": "micro"
         },
         "be": {
             "color": "",
             "alias": "Be",
             "values": [],
-            "limit": [0.0002, 0.0003]
+            "limit": [0.0002, 0.0003],
+            "class": "micro"
         },
         "ai": {
             "color": "",
             "alias": "AI",
             "values": [],
-            "limit": [0, 0]
+            "limit": [0, 0],
+            "class": "micro"
         },
         "pb": {
             "color": "",
             "alias": "Pb",
             "values": [],
-            "limit": [0.01, 0.006]
+            "limit": [0.01, 0.006],
+            "class": "micro"
         },
         "hco3": {
             "color": "",
             "alias": "HCO3",
             "values": [],
-            "limit": [0, 0]
+            "limit": [0, 0],
+            "class": "macro"
         },
         "cd": {
             "color": "",
             "alias": "Cd",
             "values": [],
-            "limit": [0.001, 0.005]
+            "limit": [0.001, 0.005],
+            "class": "micro"
         },
         "nh4": {
             "color": "",
             "alias": "NH4",
             "values": [],
-            "limit": [1.5, 0.5]
+            "limit": [1.5, 0.5],
+            "class": "macro"
         },
         "fe": {
             "color": "",
             "alias": "Fe",
             "values": [],
-            "limit": [0.3, 0.1]
+            "limit": [0.3, 0.1],
+            "class": "macro"
         },
         "sukh_ost": {
             "color": "",
             "alias": "Сухой остаток",
             "values": [],
-            "limit": [0, 0]
+            "limit": [0, 0],
+            "class": "macro"
         },
         "no2": {
             "color": "",
             "alias": "NO2",
             "values": [],
-            "limit": [3.3, 0.08]
+            "limit": [3.3, 0.08],
+            "class": "macro"
         },
         "no3": {
             "color": "",
             "alias": "NO3",
             "values": [],
-            "limit": [0, 0]
+            "limit": [0, 0],
+            "class": "macro"
         },
         "ni": {
             "color": "",
             "alias": "Ni",
             "values": [],
-            "limit": [0.02, 0.01]
+            "limit": [0.02, 0.01],
+            "class": "micro"
         },
         "mg": {
             "color": "",
             "alias": "Mg",
             "values": [],
-            "limit": [50, 40]
+            "limit": [50, 40],
+            "class": "macro"
         },
         "b": {
             "color": "",
             "alias": "B",
             "values": [],
-            "limit": [0.5, 0.5]
+            "limit": [0.5, 0.5],
+            "class": "micro"
         },
         "na": {
             "color": "",
             "alias": "Na",
             "values": [],
-            "limit": [200, 120]
+            "limit": [200, 120],
+            "class": "macro"
         },
         "k": {
             "color": "",
             "alias": "K",
             "values": [],
-            "limit": [0, 50]
+            "limit": [0, 50],
+            "class": "macro"
         },
         "mn": {
             "color": "",
             "alias": "Mn",
             "values": [],
-            "limit": [0.1, 0.01]
+            "limit": [0.1, 0.01],
+            "class": "macro"
         },
         "zn": {
             "color": "",
             "alias": "Zn",
             "values": [],
-            "limit": [1, 0.01]
+            "limit": [1, 0.01],
+            "class": "micro"
         },
         "li": {
             "color": "",
             "alias": "Li",
             "values": [],
-            "limit": [0.03, 0.08]
+            "limit": [0.03, 0.08],
+            "class": "micro"
         },
         "zhestkost": {
             "color": "",
             "alias": "Жесткость (ммоль/дм³)",
             "values": [],
-            "limit": [7, 0]
+            "limit": [7, 0],
+            "class": "macro"
         },
         "si": {
             "color": "",
             "alias": "Si",
             "values": [],
-            "limit": [0, 0]
+            "limit": [0, 0],
+            "class": "micro"
         },
         "ph": {
             "color": "",
             "alias": "pH",
             "values": [],
-            "limit": [8.5, 0]
+            "limit": [8.5, 0],
+            "class": "macro"
         },
         "ca": {
             "color": "",
             "alias": "Ca",
             "values": [],
-            "limit": [0, 180]
+            "limit": [0, 180],
+            "class": "macro"
         },
         "so4": {
             "color": "",
             "alias": "SO4",
             "values": [],
-            "limit": [500, 100]
+            "limit": [500, 100],
+            "class": "macro"
         }
     }
 }

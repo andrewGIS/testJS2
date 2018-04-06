@@ -12,7 +12,7 @@ var colorNames;// variable from samples with charts
 var dataForChartRaw;// variable from samples with charts
 var currentLyrID; // source layer , used for choose necessary pdk limit
 var limitLine;// variable for store limit pdk value when only one indicator on graph
-// // var limitLine;// variable for store limit pdk value when only one indicator on graph
+var isFirstTimeLoad = true;// variable for store limit pdk value when only one indicator on graph
 
 
 function modalListener() {
@@ -20,59 +20,32 @@ function modalListener() {
 
     $(".close-modal, .modal-sandbox").click(function () {
         $('#modal-canvas').remove();
+        $('#container').empty();
         $('#container').append('<canvas id="modal-canvas"><canvas>');
-        $("#recalcPDK").off();
-        $("#showElements").off();
-        $("#showFlowRate").off();
-        $("#modal-listIndicator").off();
-        $("#modal-listDates").off();
+        // $("#recalcPDK").off();
+        // $("#showElements").off();
+        // $("#showFlowRate").off();
         $(".modal").css({ "display": "none" });
-        document.getElementById("modal-listDates").innerHTML = "";
-        document.getElementById("modal-listIndicator").innerHTML = "";
         $("#addInfo").off();
         $("#toggleTable").off();
+        $("#lstIndicators").multiselect('unload');
+        $("#lstDates").multiselect('unload');
+        $("#lstIndicators").multiselect('reset');
+        $("#lstDates").multiselect('reset');
+        $("#macroElements").empty();
+        $("#microElements").empty();
+        $("#lstDates").empty();
+        $("#lstDates").empty();
+        isFirstTimeLoad = true;
+
     });
 
     // listener for buttons
-    document.getElementById("recalcPDK").addEventListener('click', recalcPDK);
-    document.getElementById("toggleChart").addEventListener('click', toggleChart);
-    document.getElementById("showElements").addEventListener('click', toggleTable);
-    document.getElementById("showFlowRate").addEventListener('click', toggleTable);
+    $("#recalcPDK").on('click', recalcPDK);
+    $("#toggleChart").on('click', toggleChart);
+    $("#showElements").on('click', toggleTable);
+    $("#showFlowRate").on('click', toggleTable);
 
-
-    // listener for checkbox of indicators
-    document.getElementById("modal-listIndicator").addEventListener('click', function (e) {
-
-        if (e.target.defaultValue && e.target.checked) {
-
-            addIndicator(e.target.defaultValue);
-
-        } else if (e.target.defaultValue && !e.target.checked) {
-
-            removeIndicator(e.target.defaultValue);
-
-        }
-    })
-
-    // listener for checkbox of dates
-    document.getElementById("modal-listDates").addEventListener('click', function (e) {
-
-        if (e.target.defaultValue && e.target.checked) {
-            // position of input date (when more then one elements is deleted)
-
-            var checkedCheckboxIndex = $('input[name=dates]:checked').map(function (index, obj) {
-                if (obj.value == e.target.defaultValue) {
-                    return index;
-                }
-            })
-            addDate(e.target.defaultValue, checkedCheckboxIndex[0]);
-
-        } else if (e.target.defaultValue && !e.target.checked) {
-
-            removeDate(e.target.defaultValue);
-
-        }
-    })
 }
 
 function formateDate(dateValue) {
@@ -164,9 +137,14 @@ function init() {
         }
     });
 
-    createCheckboxesIndicator(indicatorsValues);
-    createCheckboxesDates(dateValues);
+    if(isFirstTimeLoad){
 
+        createCheckboxesIndicator(indicatorsValues);
+        createCheckboxesDates(dateValues);
+
+    }
+
+    isFirstTimeLoad = false;
 
 }
 
@@ -280,35 +258,108 @@ function removeDate(dateValue) {
 };
 
 function createCheckboxesIndicator(arr) {
-    // create list of checkboxes for indicators (arr of data must be in specific view 
-    // and sorted by date)
-    var fldList = document.getElementById("modal-listIndicator");
-    for (indicator in arr) {
 
-        if (indicator == firstElement) {
-            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + ' checked="checked" id = ' + arr[indicator]["alias"] + ' />' + '<label for=' + arr[indicator]["alias"] + ' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
+    let isSelected;
+    let targetList;
+
+    $.each(arr, function (key, value) {
+
+        isSelected = key == firstElement ? true : false;
+        targetList = value['class'] == "macro" ? "macroElements" : "microElements"
+
+        $('#' + targetList)
+            .append($("<option></option>")
+                .attr("value", key)
+                .attr("selected", isSelected)
+                .text(value['alias']));
+
+    });
+
+    $('#lstIndicators').multiselect({
+        columns: 5,
+        onOptionClick: function (element, option) {
+            if (option.checked) {
+                addIndicator(option.value)
+            } else {
+                removeIndicator(option.value)
+            }
         }
-        else {
-            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + '  id = ' + arr[indicator]["alias"] + ' />' + '<label for=' + arr[indicator]["alias"] + ' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
-        }
-    }
+    });
+
 }
 
 function createCheckboxesDates(arr) {
     // create list of checkboxes for dates (arr of data must be in specific view 
     // and sorted by date)
-    var fldList = document.getElementById("modal-listDates")
 
-    arr.forEach(function (e, index) {
+    var uniqYearList;
+    // uniq list of all years
+    uniqYearList = new Set(arr.map(function (e) { return new Date(e).getFullYear() }));
 
-        fldList.innerHTML += '<input type="checkbox" name="dates" value=' + e + ' checked="checked" id = ' + e + ' />' +
-            '<label for=' + e + ' class = "labelDates">' + formateDate(e) + '</label>'
+    // create drop lists by years
+    uniqYearList.forEach(function (value, v, k) {
 
-    })
+        $('#lstDates')
+            .append($("<optgroup></optgroup>")
+                .attr("id", "group" + value)
+                .attr("label", value));
+
+    });
+
+    // push values in neccesary group
+    $.each(arr, function (key, value) {
+
+        let isSelected = true;
+        let curYearId = new Date(value).getFullYear();
+
+        $('#group' + curYearId)
+            .append($("<option></option>")
+                .attr("value", value)
+                .attr("selected", isSelected)
+                .text(formateDate(value)));
+
+    });
+
+    // create multiselect
+    $('#lstDates').multiselect({
+        columns: 5,
+        selectGroup: true,
+        onOptionClick: function (element, option) {
+            //console.log(element);
+            if (option.checked) {
+                // position of element
+                let position;
+                $(element).find('option:selected').each(function (index, value) {
+                    if (option.value == $(value).attr("value")) {
+                        console.log(index);
+                        position = index;
+                    }
+                })
+                addDate(option.value, position)
+            } else {
+                removeDate(option.value)
+            }
+        }
+    });
+
+
 
 }
 
 function addIndicator(indicatorName) {
+    // need to add only checked dates
+
+    // all checked dates indexes
+    let checkedDatesIndex = [];
+    $('#lstDates').find('option:selected').each(function(key,value){
+        checkedDatesIndex.push(dateValues.indexOf(parseInt(value.value)));
+    })
+
+    // extract values 
+    let arrValues = checkedDatesIndex.map(function(index){
+        return indicatorsValues[indicatorName]['values'][index]
+    })
+
     // add selected (clicked) indicator to chart
     let dataToAdd;
 
@@ -316,17 +367,21 @@ function addIndicator(indicatorName) {
 
     if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
 
-        dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
+        // dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
+        dataToAdd = arrValues.map(function (value) {
 
-            return value / indicatorsValues[indicatorName]['limit'];
+            // limit number for using neccessary limit
+            return value / indicatorsValues[indicatorName]['limit'][limitNumber()];
 
         });
 
     } else {
 
-        dataToAdd = indicatorsValues[indicatorName]['values']
+        dataToAdd = arrValues;
 
     }
+
+    // need to add only checked data
 
     var newDataset = {
         label: indicatorsValues[indicatorName]['alias'],
@@ -441,7 +496,7 @@ function toggleChart() {
                         }
                     },
                     afterBuildTicks: function (axe) {
-                        console.log(axe.max);
+                        //console.log(axe.max);
                         let labelsCount = 3;
                         axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
                     }
@@ -464,24 +519,43 @@ function toggleTable() {
     //console.log(dataForChartRaw[1])
     if (this.id == "showFlowRate") {
         myBar.destroy();
-        document.getElementById("modal-listDates").innerHTML = "";
-        document.getElementById("modal-listIndicator").innerHTML = "";
         indicatorsValues = pushElementsValues(dataForChartRaw[1], 2);
         dateValues = dataForChartRaw[1].map(function (e) { return parseInt(Object.keys(e)[0]) });
         charTitle = "Данные по расходам"; // get name from first object
         color = Chart.helpers.color;
         colorNames = Object.keys(window.chartColors);
         firstElement = "rashod";
+        barChartData = {
+            labels: dateValues.map(function (e) { return formateDate(e) }),
+            datasets: [{
+                label: indicatorsValues[firstElement]['alias'],
+                backgroundColor: indicatorsValues[firstElement]['color'],
+                borderColor: window.chartColors.red,
+                borderWidth: 1,
+                data: indicatorsValues[firstElement]['values']
+            }]
+    
+        };
         $("#recalcPDK").prop("disabled", true);
+        $('#lstIndicators').multiselect( 'disable', true );
+        //$("#lstDates").multiselect('reset');
+        $("#lstDates").empty();
+        createCheckboxesDates(dateValues);
+        $("#lstDates").multiselect('reload');
         init();
+
 
     }
     else {
         myBar.destroy();
-        document.getElementById("modal-listDates").innerHTML = "";
-        document.getElementById("modal-listIndicator").innerHTML = "";
+        $("#recalcPDK").prop("disabled", true);
+        $('#lstIndicators').multiselect( 'disable', false );
+        $("#lstDates").empty();
         $("#recalcPDK").prop("disabled", false);
+        dateValues = dataForChartRaw[0].map(function (e) { return parseInt(Object.keys(e)[0]) });
+        createCheckboxesDates(dateValues);
         loadModal(dataForChartRaw);
+        $('#lstDates').multiselect('reload');
     }
 
 }
@@ -513,7 +587,7 @@ function limitNumber() {
 }
 
 function setLine() {
-    if (myBar.chart.config.data.datasets.length == 1) {
+    if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть значения") {
 
         let currentIndicatorAlias = myBar.chart.config.data.datasets[0].label
         let elements = returnBlankTemplate();
@@ -556,5 +630,25 @@ function setLine() {
     }
     else {
         myBar.chart.annotation.options.annotations.pop();
+    }
+}
+
+function toggleYear() {
+    // when click select  (unselect all ) add whole group 
+    // to bar 
+    console.log(this.previousSibling.innerText);
+    console.log(this.innerText);
+
+    let year = this.previousSibling.innerText;
+    let isSelected = this.previousSibling.innerText;
+
+    if (isSelected == "select all") {
+        $(dateValues).each(function (key, value) {
+            if (value ){
+
+            }
+        })
+    } else {
+
     }
 }
