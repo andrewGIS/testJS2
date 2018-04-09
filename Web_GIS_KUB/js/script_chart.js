@@ -12,8 +12,7 @@ var colorNames;// variable from samples with charts
 var dataForChartRaw;// variable from samples with charts
 var currentLyrID; // source layer , used for choose necessary pdk limit
 var limitLine;// variable for store limit pdk value when only one indicator on graph
-var isFirstTimeLoad = true;// variable for store limit pdk value when only one indicator on graph
-
+var isFirstTimeLoad = true;// is first time to load 
 
 function modalListener() {
     // assert event handler for dom elements
@@ -53,7 +52,6 @@ function formateDate(dateValue) {
     };
     return new Date(parseInt(dateValue)).toLocaleString("ru", options);
 }
-
 
 function init() {
     // create data for Chart and show modal window and create check boxes
@@ -106,7 +104,10 @@ function init() {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Значение показателя'
+                        labelString: 'Значение показателя, мг/дм³',
+                        fontFamily:"'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontSize: 14,
+                        fontStyle:"bold",
                     },
                     type: 'logarithmic',
                     ticks: {
@@ -123,7 +124,11 @@ function init() {
                 xAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Даты'
+                        labelString: 'Даты обследований',
+                        fontFamily:"'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontSize: 14,
+                        fontStyle:"bold",
+                        padding: 4,
                     }
                 }]
 
@@ -134,13 +139,14 @@ function init() {
         }
     });
 
-    if(isFirstTimeLoad){
+    if (isFirstTimeLoad) {
 
-        createCheckboxesIndicator(indicatorsValues);
+        
         createCheckboxesDates(dateValues);
 
     }
 
+    createCheckboxesIndicator(indicatorsValues);
     isFirstTimeLoad = false;
 
 }
@@ -223,7 +229,6 @@ function addDate(dateValue, position) {
     }
 };
 
-
 function removeIndicator(indicatorName) {
 
     // remove indicator from chart
@@ -238,7 +243,6 @@ function removeIndicator(indicatorName) {
     setLine();
     myBar.update();
 };
-
 
 function removeDate(dateValue) {
     // remove selected data from chart
@@ -348,12 +352,12 @@ function addIndicator(indicatorName) {
 
     // all checked dates indexes
     let checkedDatesIndex = [];
-    $('#lstDates').find('option:selected').each(function(key,value){
+    $('#lstDates').find('option:selected').each(function (key, value) {
         checkedDatesIndex.push(dateValues.indexOf(parseInt(value.value)));
     })
 
     // extract values 
-    let arrValues = checkedDatesIndex.map(function(index){
+    let arrValues = checkedDatesIndex.map(function (index) {
         return indicatorsValues[indicatorName]['values'][index]
     })
 
@@ -398,7 +402,6 @@ function recalcPDK() {
     // recalc data in pdk value (pdk must be setted in elements)
     //console.log(currentLyrID);
 
-    // need to add only checked dates
 
     if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в ПДК") {
 
@@ -427,6 +430,9 @@ function recalcPDK() {
         document.getElementById("recalcPDK").innerHTML = "Пересчитать в ПДК";
 
         setLine();
+
+        // add only checked data
+        // check it with data
 
         barChartData.datasets.forEach(function (dataset) {
 
@@ -483,30 +489,45 @@ function toggleTable() {
                 borderWidth: 1,
                 data: indicatorsValues[firstElement]['values']
             }]
-    
+
         };
         $("#recalcPDK").prop("disabled", true);
-        $('#lstIndicators').multiselect( 'disable', true );
+        $('#lstIndicators').multiselect('disable', true);
         //$("#lstDates").multiselect('reset');
         $("#lstDates").empty();
         createCheckboxesDates(dateValues);
         $("#lstDates").multiselect('reload');
         init();
+        $("#formIndicator").hide();
 
 
     }
     else {
         myBar.destroy();
         $("#recalcPDK").prop("disabled", true);
-        $('#lstIndicators').multiselect( 'disable', false );
+        $('#lstIndicators').multiselect('disable', false);
         $("#lstDates").empty();
         $("#recalcPDK").prop("disabled", false);
         dateValues = dataForChartRaw[0].map(function (e) { return parseInt(Object.keys(e)[0]) });
+        $("#macroElements").empty();
+        $("#microElements").empty();
         createCheckboxesDates(dateValues);
-        loadModal(dataForChartRaw);
-        $('#lstDates').multiselect('reload');
-    }
+        $("#lstDates").multiselect('reload');
+        loadModal(dataForChartRaw, currentLyrID);
+        $("#formIndicator").show();
 
+        // set selected indicators to first element
+        $("#lstIndicators option:selected").each(function (key, value) {
+            if (value.value == firstElement) {
+                $(value).prop("selected", true)
+            }
+            else {
+                $(value).removeAttr("selected")
+            }
+        })
+        $("#lstIndicators").multiselect('reload');
+        $("#lstIndicators").trigger("onSelectAll")
+    }
 }
 
 function range(start, edge, step) {
@@ -580,25 +601,5 @@ function setLine() {
     }
     else {
         myBar.chart.annotation.options.annotations.pop();
-    }
-}
-
-function toggleYear() {
-    // when click select  (unselect all ) add whole group 
-    // to bar 
-    console.log(this.previousSibling.innerText);
-    console.log(this.innerText);
-
-    let year = this.previousSibling.innerText;
-    let isSelected = this.previousSibling.innerText;
-
-    if (isSelected == "select all") {
-        $(dateValues).each(function (key, value) {
-            if (value ){
-
-            }
-        })
-    } else {
-
     }
 }

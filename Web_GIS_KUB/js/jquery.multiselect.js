@@ -855,7 +855,8 @@
             }
 
             // UPDATE PLACEHOLDER TEXT WITH OPTIONS SELECTED
-            placeholderTxt.text(selOpts.join(', '));
+            // placeholderTxt.text(selOpts.join(', '));
+            placeholderTxt.text(select.val().length + " выбрано")
 
             if (selOpts.length) {
                 optionsWrap.closest('.ms-options-wrap').addClass('ms-has-selections');
