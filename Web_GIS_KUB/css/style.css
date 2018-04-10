@@ -75,7 +75,7 @@ html, body {
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 0px;
-	background: #FFFFFF;
+	background: #ffebcc;
 }
 #LayList{
 	position: absolute;
@@ -146,7 +146,7 @@ html, body {
 	border-style: solid;
 	border-width: 1px;
 	border-radius: 0px;
-	background: #FFFFFF;
+	background: #ffebcc;
 }
 #InfoBut{
 	position: absolute;
@@ -179,7 +179,7 @@ html, body {
 	background-color: rgba(102,102,102,0.80);	
 }
 .esriLayerList .esriContainer {
-	background-color: #FFFFFF;
+	background-color: #ffebcc;
 	border-color: #000000;
 	border-style: solid;
 	border-width: 1px;
@@ -187,11 +187,16 @@ html, body {
 	color: #000000;
 	overflow-x:auto;
     overflow-y:auto;
-	/*height: 500px;*/
 	width: 250px;
 	bottom: 0px;
 	font-family: Corbel;
 	font-size: 14px;	
+}
+.esriLayerList .esriTabContainer {
+	display: block;
+}
+.esriLayerList .esriHasTabContent.esriListVisible .esriToggleButton {
+	display: none;
 }
 #rightPanelSet{
 	right: 0px;
@@ -214,7 +219,7 @@ html, body {
 	float:right;
     overflow-x:hidden;
     overflow-y:auto; 
-    background-color: #FFFFFF; 
+    background-color: #ffebcc; 
     z-index: 50;
 	position: absolute;
 	font-size: 14px;
