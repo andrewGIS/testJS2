@@ -67,6 +67,7 @@ require([
 		var identifyResult;
 		var identifyTask, identifyParams;				
 		var massPointLabels = ["Отвалы", "Изливы", "Родники"];
+		var identificationLayerId;
 
 		map.on('load', function (results) {
 			mMeasure = new Measurement({
@@ -374,6 +375,9 @@ require([
 			//map.graphics.clear();
 			identifyParams.geometry = event.mapPoint;
 			identifyParams.returnGeometry = true;
+			// identifyParams.maxAllowableOffset  = 1000;
+			identifyParams.maxAllowableOffset  = 100;
+			//identifyParams.geometryPrecision  = -10;
 			identifyParams.mapExtent = map.extent;
 			identifyTask.execute(identifyParams, function (idResults) {
 				//addToMap(idResults, event);
@@ -585,10 +589,10 @@ require([
 
 			//console.log(identifyResults[selectedInfoNumber])
 
-			let layerID = identifyResults[selectedInfoNumber].layerId
+			identificationLayerId = identifyResults[selectedInfoNumber].layerId
 
 			let targetLyr = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" +
-				layerID)
+				identificationLayerId)
 
 			let relatedTaskResult = [];
 
@@ -654,7 +658,7 @@ require([
 			});
 
 			if (arr.length) {
-				loadModal(arr);
+				loadModal(arr,identificationLayerId);
 			} else {
 				alert("Нет дополнительной информации для точки")
 			}

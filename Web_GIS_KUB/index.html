@@ -13,18 +13,22 @@
 	<link rel="stylesheet" href="https://js.arcgis.com/3.22/dgrid/css/dgrid.css">
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/modal.css">
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>
+	<link rel="stylesheet" href="css/jquery.multiselect.css">
+	<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>-->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://js.arcgis.com/3.23/"></script>
-	
+
 	<!--<script type="text/javascript" src="js/script.js"></script>-->
 	<!--<script type="text/javascript" src="js/script_all.js"></script>-->
 	<script type="text/javascript" src="js/scriptMerge.js"></script>
 
-	
+
 	<script type="text/javascript" src="js/elements.js"></script>
 	<script type="text/javascript" src="js/script_chart.js"></script>
 	<script type="text/javascript" src="js/utils_chart.js"></script>
+	<script type="text/javascript" src="js/chartjs-plugin-annotation.js"></script>
+	<script type="text/javascript" src="js/jquery.multiselect.js"></script>
 
 </head>
 
@@ -109,9 +113,15 @@
 		<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;">
 			<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
 			<div id="pager">
-					<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;"><img src="images/arrow_previous.png" style="width: 20px; height: 20px;"></button>				 
-					<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;"><img src="images/arrow_next.png" style="width: 20px; height: 20px;"></button>
-					<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;"><img src="images/clear_select.png" style="width: 20px; height: 20px;"></button>
+				<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;">
+					<img src="images/arrow_previous.png" style="width: 20px; height: 20px;">
+				</button>
+				<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;">
+					<img src="images/arrow_next.png" style="width: 20px; height: 20px;">
+				</button>
+				<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;">
+					<img src="images/clear_select.png" style="width: 20px; height: 20px;">
+				</button>
 			</div>
 			<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
 			<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'">
@@ -142,31 +152,37 @@
 		<div class="modal-box">
 			<div class="modal-header">
 				<div class="close-modal">&#10006;</div>
-				<h1>Дополнительная информация</h1>
+				<!--<h1>Дополнительная информация</h1>-->
 			</div>
 			<div class="modal-body">
 				<div id="container" style="width: 100%;">
 					<canvas id="modal-canvas"></canvas>
 				</div>
-				<div id="divDates" style="width: 100%;">
-					<div>
-						<form id = "formDates">
-							<fieldset id="modal-listDates">
-							</fieldset>
-						</form>
-					</div>
+				<div id="modal-forms">
+					<form id="formDates">Даты обследований
+						<select multiple="multiple" id="lstDates" name="lstDates">
+						</select>
+						<!--<fieldset id="modal-listDates">
+									</fieldset>-->
+					</form>
+					<form id="formIndicator"> Показатели
+						<select multiple="multiple" id="lstIndicators" name="lstIndicators">
+							<optgroup id="macroElements" label="Микроэлементы">
+							</optgroup>
+							<optgroup id="microElements" label="Макроэлементы и общие элементы">
+							</optgroup>
+						</select>
+						<!--<fieldset id="modal-listIndicator">
+							</fieldset>-->
+					</form>
+
+
 				</div>
-				<div id="divIndicators" style="width: 100%;">
-					<div>
-						<form id="formIndicator">
-							<fieldset id="modal-listIndicator">
-							</fieldset>
-						</form>
-					</div>
+				<div id = "modal-buttons-div">
+					<button id="recalcPDK" class="modalButton">Пересчитать в ПДК</button>
+					<button id="showElements" class="modalButton" disabled>Данные по элементам</button>
+					<button id="showFlowRate" class="modalButton" disabled>Данные по расходам</button>
 				</div>
-				<button id="recalcPDK" class = "modalButton">Пересчитать в ПДК</button>
-				<button id="toggleChart" class = "modalButton">Изменить тип графика</button>
-				<button id="toggleTable" class = "modalButton" disabled>Данные по расходам</button>
 			</div>
 		</div>
 	</div>
