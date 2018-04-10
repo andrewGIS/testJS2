@@ -99,6 +99,10 @@ require([
 		//добавление сервисов
 		var BaseMap = new ArcGISTiledMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Base_Map/MapServer");		
 		var PollutionMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer");		
+		var PhotoLayer = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Photos/MapServer/0", {
+			outFields: ["comments", "name_file", "date"],
+			infoTemplate: new InfoTemplate("Фотография", "<a href='photos_kub/${name_file}' target='_blank'><img src='photos_kub/${name_file}' width='250'></a><br>${comments}<br>Дата съемки: ${date:DateFormat(selector: 'date', fullYear: true)}")
+		});	
 
 		var OSMMap = new WebTiledLayer("http://c.tile.openstreetmap.org/${level}/${col}/${row}.png", {
 			"copyright": 'Map data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -110,22 +114,18 @@ require([
 		var ArcGISWI = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer");
 		var ArcGISWTM = new ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer");
 
-		/*var RivBassSmall = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/0", {
-			outFields: ["*"],
-		});
-		var RivBassLarge = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/River_bassins/MapServer/1", {
-			outFields: ["*"],
-		});*/
-
-		// var selectionSymbolPol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-		// 	new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205, 10, 20, 1]), 2.5),
-		// 	new Color([125, 125, 125, 0.5]));
-		//RivBassLarge.setSelectionSymbol(selectionSymbolPol);
-		//RivBassSmall.setSelectionSymbol(selectionSymbolPol);
-
 		map.addLayers([ArcGISWTM, ArcGISWI, rosreestrMap, rosreestrMapAno, OSMMap, BaseMap]);
-		map.addLayers([PollutionMap]);
+		map.addLayers([PollutionMap, PhotoLayer]);
 		
+		PhotoLayer.hide();
+		BaseMap.hide();
+
+		//clustering for photos
+		PhotoLayer.setFeatureReduction({
+			type: "cluster",
+			clusterRadius: 25,
+		});
+
 		rosreestrMap.hide();
 		rosreestrMapAno.hide();
 		ArcGISWI.hide();
@@ -214,7 +214,8 @@ require([
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				cursorOut();				
+				cursorOut();
+				map.graphics.clear();				
 			} else {
 				dom.byId('layerListDom').style.display = 'none';
 			}
@@ -238,7 +239,8 @@ require([
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				cursorOut();				
+				cursorOut();	
+				map.graphics.clear();				
 			} else {
 				dom.byId('caseTitlePaneBM').style.display = 'none';
 			}
@@ -259,7 +261,7 @@ require([
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-								
+				map.graphics.clear();	
 			} else {
 				dom.byId('dMeasurePane').style.display = 'none';
 				destroyMeasure();
@@ -301,6 +303,15 @@ require([
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
 				cursorOut();				
+			}
+		});
+
+		// Button for show photos
+		on(dom.byId("PhotosBut"), "click", function(){
+			if(PhotoLayer.visible == false){
+				PhotoLayer.show();
+			} else {
+				PhotoLayer.hide();
 			}
 		});
 
@@ -375,10 +386,8 @@ require([
 			//map.graphics.clear();
 			identifyParams.geometry = event.mapPoint;
 			identifyParams.returnGeometry = true;
-			// identifyParams.maxAllowableOffset  = 1000;
-			identifyParams.maxAllowableOffset  = 100;
-			//identifyParams.geometryPrecision  = -10;
 			identifyParams.mapExtent = map.extent;
+			identifyParams.maxAllowableOffset = 10;			
 			identifyTask.execute(identifyParams, function (idResults) {
 				//addToMap(idResults, event);
 				//console.log(idResults[0]);
@@ -471,9 +480,9 @@ require([
 					datasets: [{
 						data: data,
 						backgroundColor: [
-							window.chartColors.orange,
-							window.chartColors.yellow,
-							window.chartColors.blue,
+							'#828282',
+							'#ff00c5',
+							'#730000',	
 						],
 						label: 'Dataset 1'
 					}],
@@ -671,9 +680,8 @@ require([
 			// set point symbol
 			switch (typeGeometry) {
 				case "point":
-					var markerSymbol = new SimpleMarkerSymbol();
-					markerSymbol.setPath("M16,4.938c-7.732,0-14,4.701-14,10.5c0,1.981,0.741,3.833,2.016,5.414L2,25.272l5.613-1.44c2.339,1.316,5.237,2.106,8.387,2.106c7.732,0,14-4.701,14-10.5S23.732,4.938,16,4.938zM16.868,21.375h-1.969v-1.889h1.969V21.375zM16.772,18.094h-1.777l-0.176-8.083h2.113L16.772,18.094z");
-					markerSymbol.setColor(new Color("#00FFFF"));
+					var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+						new Color([0,0,0]), 1.5), new Color([248,0,0,0.8]));
 					return markerSymbol;
 
 				case "polygon":
