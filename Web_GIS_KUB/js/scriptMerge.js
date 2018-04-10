@@ -60,12 +60,12 @@ require([
 		var mapClick;
 		var clickPnt;
 		var selectedContent;
-		var selectedFeatures;		
+		var selectedFeatures;
 		var iNumb;
 		var queryLaySelect;
 		var selectedInfoNumber;
 		var identifyResult;
-		var identifyTask, identifyParams;				
+		var identifyTask, identifyParams;
 		var massPointLabels = ["Отвалы", "Изливы", "Родники"];
 		var identificationLayerId;
 
@@ -97,12 +97,12 @@ require([
 		});
 
 		//добавление сервисов
-		var BaseMap = new ArcGISTiledMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Base_Map/MapServer");		
-		var PollutionMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer");		
+		var BaseMap = new ArcGISTiledMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Base_Map/MapServer");
+		var PollutionMap = new ArcGISDynamicMapServiceLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer");
 		var PhotoLayer = new FeatureLayer("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Photos/MapServer/0", {
 			outFields: ["comments", "name_file", "date"],
 			infoTemplate: new InfoTemplate("Фотография", "<a href='photos_kub/${name_file}' target='_blank'><img src='photos_kub/${name_file}' width='250'></a><br>${comments}<br>Дата съемки: ${date:DateFormat(selector: 'date', fullYear: true)}")
-		});	
+		});
 
 		var OSMMap = new WebTiledLayer("http://c.tile.openstreetmap.org/${level}/${col}/${row}.png", {
 			"copyright": 'Map data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -116,7 +116,7 @@ require([
 
 		map.addLayers([ArcGISWTM, ArcGISWI, rosreestrMap, rosreestrMapAno, OSMMap, BaseMap]);
 		map.addLayers([PollutionMap, PhotoLayer]);
-		
+
 		PhotoLayer.hide();
 		BaseMap.hide();
 
@@ -130,7 +130,7 @@ require([
 		rosreestrMapAno.hide();
 		ArcGISWI.hide();
 		ArcGISWTM.hide();
-				
+
 
 		var overviewMapDijit = new OverviewMap({
 			map: map,
@@ -157,8 +157,8 @@ require([
 			map: map,
 			showLegend: true,
 			showSubLayers: true,
-			showOpacitySlider: false,			
-			layers: [{				
+			showOpacitySlider: false,
+			layers: [{
 				layer: PollutionMap,
 				title: "Слои"
 			}],
@@ -210,12 +210,12 @@ require([
 				document.getElementById('map').style.right = '40px';
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();				
+				mapClick.remove();
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
 				cursorOut();
-				map.graphics.clear();				
+				map.graphics.clear();
 			} else {
 				dom.byId('layerListDom').style.display = 'none';
 			}
@@ -235,12 +235,12 @@ require([
 				document.getElementById('map').style.right = '40px';
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();				
+				mapClick.remove();
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				cursorOut();	
-				map.graphics.clear();				
+				cursorOut();
+				map.graphics.clear();
 			} else {
 				dom.byId('caseTitlePaneBM').style.display = 'none';
 			}
@@ -257,11 +257,11 @@ require([
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				mapClick.remove();
-				cursorOut();				
+				cursorOut();
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				map.graphics.clear();	
+				map.graphics.clear();
 			} else {
 				dom.byId('dMeasurePane').style.display = 'none';
 				destroyMeasure();
@@ -291,7 +291,7 @@ require([
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
 				mapClick = map.on("click", doIdentify);
-				cursorOver();								
+				cursorOver();
 			} else {
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
@@ -302,13 +302,13 @@ require([
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
-				cursorOut();				
+				cursorOut();
 			}
 		});
 
 		// Button for show photos
-		on(dom.byId("PhotosBut"), "click", function(){
-			if(PhotoLayer.visible == false){
+		on(dom.byId("PhotosBut"), "click", function () {
+			if (PhotoLayer.visible == false) {
 				PhotoLayer.show();
 			} else {
 				PhotoLayer.hide();
@@ -383,11 +383,12 @@ require([
 		// Identify
 		function doIdentify(event) {
 
-			//map.graphics.clear();
+			// make identify
+
 			identifyParams.geometry = event.mapPoint;
 			identifyParams.returnGeometry = true;
 			identifyParams.mapExtent = map.extent;
-			identifyParams.maxAllowableOffset = 10;			
+			identifyParams.maxAllowableOffset = 10;
 			identifyTask.execute(identifyParams, function (idResults) {
 				//addToMap(idResults, event);
 				//console.log(idResults[0]);
@@ -427,7 +428,14 @@ require([
 				currentObject.layerName + "</td></tr>"
 
 			$.each(currentObject.feature.attributes, function (key, value) {
-				if (key !== "OBJECTID" && key !== "Shape" && key !== "objectid") {
+				// exlcuded fields 
+				if (key !== "OBJECTID"
+					&& key !== "Shape"
+					&& key !== "objectid"
+					&& key !== "shape"
+					&& key !== "st_area(shape)"
+					&& key !== "objectid_1"
+				) {
 					currentContent += "<tr><td class='tdGray'>" + key + "</td><td>" +
 						value + "</td></tr>"
 				}
@@ -453,7 +461,7 @@ require([
 		}
 
 		function PrepareDataForPieChart(geometry) {
-			var IdsLyrForQuery = ["5", "6", "7"];			
+			var IdsLyrForQuery = ["5", "6", "7"];
 			Promise.all(IdsLyrForQuery.map(function (element) {
 				var urlLayerQuery = "http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" + element;
 				var qt = new QueryTask(urlLayerQuery);
@@ -463,17 +471,23 @@ require([
 				queryParams.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
 				queryParams.geometry = geometry;
 				return qt.execute(queryParams, function (results) {
-					console.log(results);
-					console.log(results.features.length);
-					return results;					
-				});					
-			})).then(values => CreatePieChart(values.map(function(e){
-				return e.features.length})));
+					//console.log(results);
+					//console.log(results.features.length);
+					return results;
+				});
+			})).then(values => CreatePieChart(values.map(function (e) {
+				return e.features.length
+			})));
 		}
 
 		//create new pie diagram with pollution points statistics in bassins
 
 		function CreatePieChart(data) {
+			// if zeros data return nothing
+			let isEmpty = !data.some(el => el !== 0);
+			if (isEmpty){
+				return
+			}
 			var config = {
 				type: 'pie',
 				data: {
@@ -482,7 +496,7 @@ require([
 						backgroundColor: [
 							'#828282',
 							'#ff00c5',
-							'#730000',	
+							'#730000',
 						],
 						label: 'Dataset 1'
 					}],
@@ -490,13 +504,13 @@ require([
 				},
 				options: {
 					responsive: true,
-					legend:{
+					legend: {
 						display: true,
 						position: 'bottom',
 						labels: {
 							boxWidth: 20
 						}
-					}										
+					}
 				}
 			};
 
@@ -510,7 +524,7 @@ require([
 
 			registry.byId("rightPane").set("content",
 				createTable(identifyResults[number]));
-				PrepareDataForPieChart(identifyResults[number].feature.geometry);				
+			PrepareDataForPieChart(identifyResults[number].feature.geometry);
 
 			// load first time
 			if (number == 0) {
@@ -667,7 +681,7 @@ require([
 			});
 
 			if (arr.length) {
-				loadModal(arr,identificationLayerId);
+				loadModal(arr, identificationLayerId);
 			} else {
 				alert("Нет дополнительной информации для точки")
 			}
@@ -681,13 +695,16 @@ require([
 			switch (typeGeometry) {
 				case "point":
 					var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-						new Color([0,0,0]), 1.5), new Color([248,0,0,0.8]));
+						new Color([0, 0, 0]), 1.5), new Color([248, 0, 0, 0.8]));
 					return markerSymbol;
 
 				case "polygon":
 					return new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
 						new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([205, 10, 20, 1]), 2.5),
 						new Color([125, 125, 125, 0.5]));
+
+				case "polyline":
+					return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([102, 0, 0, 1]), 7.5)
 			}
 		}
 
