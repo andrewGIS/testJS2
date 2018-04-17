@@ -159,7 +159,7 @@ function returnBlankTemplate() {
             "color": "",
             "alias": "pH",
             "values": [],
-            "limit": [8.5, 0],
+            "limit": [7.0, 7.0],
             "class": "macro"
         },
         "ca": {

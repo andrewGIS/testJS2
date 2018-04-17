@@ -57,20 +57,6 @@ function init() {
     // create data for Chart and show modal window and create check boxes
     $("#modal-name").css({ "display": "block" });
 
-    // set limitLine
-    limitLine = [{
-        type: 'line',
-        mode: 'horizontal',
-        scaleID: 'y-axis-0',
-        value: indicatorsValues[firstElement]['limit'][0],
-        borderWidth: 5,
-        borderColor: 'red',
-        label: {
-            backgroundColor: "red",
-            content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][0] + ")",
-            enabled: true
-        }
-    }];
 
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
@@ -83,6 +69,22 @@ function init() {
         }]
 
     };
+
+    // set limitLine
+    limitLine = [{
+        type: 'line',
+        mode: 'horizontal',
+        scaleID: 'y-axis-0',
+        value: indicatorsValues[firstElement]['limit'][limitNumber()],
+        borderWidth: 5,
+        borderColor: 'red',
+        label: {
+            backgroundColor: "red",
+            content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
+            enabled: true,
+            yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - indicatorsValues[firstElement]['limit'][limitNumber()] > 0 ? -10 : 10,
+        }
+    }];
 
 
     myBar = new Chart(targetCanvas, {
@@ -105,9 +107,9 @@ function init() {
                     scaleLabel: {
                         display: true,
                         labelString: 'Значение показателя, мг/дм³',
-                        fontFamily:"'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
-                        fontStyle:"bold",
+                        fontStyle: "bold",
                     },
                     type: 'logarithmic',
                     ticks: {
@@ -125,9 +127,9 @@ function init() {
                     scaleLabel: {
                         display: true,
                         labelString: 'Даты обследований',
-                        fontFamily:"'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
-                        fontStyle:"bold",
+                        fontStyle: "bold",
                         padding: 4,
                     }
                 }]
@@ -139,9 +141,11 @@ function init() {
         }
     });
 
+
+
     if (isFirstTimeLoad) {
 
-        
+
         createCheckboxesDates(dateValues);
 
     }
