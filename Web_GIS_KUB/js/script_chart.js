@@ -63,8 +63,6 @@ function init() {
         datasets: [{
             label: indicatorsValues[firstElement]['alias'],
             backgroundColor: indicatorsValues[firstElement]['color'],
-            borderColor: window.chartColors.red,
-            borderWidth: 1,
             data: indicatorsValues[firstElement]['values']
         }]
 
@@ -82,6 +80,7 @@ function init() {
             backgroundColor: "red",
             content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
             enabled: true,
+            // for determination side of label above or below line
             yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - indicatorsValues[firstElement]['limit'][limitNumber()] > 0 ? -10 : 10,
         }
     }];

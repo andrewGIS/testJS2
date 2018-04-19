@@ -436,8 +436,12 @@ require([
 					&& key !== "st_area(shape)"
 					&& key !== "objectid_1"
 				) {
+
+					// round float fields values, other stay as they are
+					let formattedValue = parseFloat(value) ? parseFloat(value).toFixed(2) : value
+
 					currentContent += "<tr><td class='tdGray'>" + key + "</td><td>" +
-						value + "</td></tr>"
+						formattedValue + "</td></tr>"
 				}
 
 			});
@@ -446,7 +450,7 @@ require([
 				currentObject.layerId === 7 ||
 				currentObject.layerId === 8 ||
 				currentObject.layerId === 9) {
-				currentContent += "<tr><td><button id = 'addInfo'> Доп.информация </button></td></tr>"
+				currentContent += "<tr><td><button id = 'addInfo' class = 'modalButton' style = 'font-size: 13px;padding:0'> Доп.информация </button></td></tr>"
 			}
 
 			if (currentObject.layerId === 23 ||
@@ -485,7 +489,7 @@ require([
 		function CreatePieChart(data) {
 			// if zeros data return nothing
 			let isEmpty = !data.some(el => el !== 0);
-			if (isEmpty){
+			if (isEmpty) {
 				return
 			}
 			var config = {

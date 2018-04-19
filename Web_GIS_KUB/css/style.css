@@ -222,8 +222,8 @@ html, body {
     background-color: #ffebcc; 
     z-index: 50;
 	position: absolute;
-	font-size: 14px;
-	font-family: Calibri;
+	font-size: 13px;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 #footer1 {
     position: absolute;
