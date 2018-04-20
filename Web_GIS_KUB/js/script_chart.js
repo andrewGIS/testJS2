@@ -17,7 +17,10 @@ var isFirstTimeLoad = true;// is first time to load
 function modalListener() {
     // assert event handler for dom elements
 
-    $(".close-modal, .modal-sandbox").click(function () {
+    // modified this for scroolling list of elements
+    // now only click on close modal closing modal window
+    // $(".close-modal, .modal-sandbox").click(function () {
+    $(".close-modal").click(function () {
         $('#modal-canvas').remove();
         $('#container').empty();
         $('#container').append('<canvas id="modal-canvas"><canvas>');
@@ -151,6 +154,14 @@ function init() {
 
     createCheckboxesIndicator(indicatorsValues);
     isFirstTimeLoad = false;
+    
+    // disable button for first time load if first element is pH
+    if (firstElement == "ph"){
+        $("#recalcPDK").prop("disabled", true);
+    }
+    else {
+        $("#recalcPDK").prop("disabled", false);
+    }
 
 }
 
@@ -269,7 +280,7 @@ function createCheckboxesIndicator(arr) {
     $.each(arr, function (key, value) {
 
         isSelected = key == firstElement ? true : false;
-        targetList = value['class'] == "macro" ? "macroElements" : "microElements"
+        targetList = value['class'] == "macro" ?  "microElements": "macroElements"
 
         $('#' + targetList)
             .append($("<option></option>")
@@ -423,6 +434,11 @@ function recalcPDK() {
 
                     if (name == indicatorsValues[indicator]['alias']) {
 
+                        // for pH set pdk values none 
+                        if (name == "pH") {
+                            return 0
+                        }
+
                         return value / indicatorsValues[indicator]['limit'][limitNumber()];
                     }
                 }
@@ -442,6 +458,7 @@ function recalcPDK() {
             let name = dataset.label
 
             //dataset.data = dataset.data.map(function (value) {
+
 
             for (indicator in indicatorsValues) {
 
@@ -562,6 +579,11 @@ function limitNumber() {
 function setLine() {
     if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть значения") {
 
+        // disable button recalc pdk for pH
+        if (myBar.chart.config.data.datasets[0].label == "pH") {
+            $("#recalcPDK").prop("disabled", true);
+        }
+
         let currentIndicatorAlias = myBar.chart.config.data.datasets[0].label
         let elements = returnBlankTemplate();
         let pdkValue;
@@ -604,5 +626,8 @@ function setLine() {
     }
     else {
         myBar.chart.annotation.options.annotations.pop();
+        // enable button recalcPDK when more than one element 
+        // enable button one element but not is pH
+        $("#recalcPDK").prop("disabled", false);
     }
 }

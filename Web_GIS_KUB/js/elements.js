@@ -6,7 +6,7 @@ function returnBlankTemplate() {
             "alias": "CI",
             "values": [],
             "limit": [0, 0],
-            "class": "micro"
+            "class": "macro"
         },
         "co": {
             "color": "#e4d6a7",
@@ -38,7 +38,7 @@ function returnBlankTemplate() {
         },
         "hco3": {
             "color": "#ffcf56",
-            "alias": "HCO3",
+            "alias": "HCO₃",
             "values": [],
             "limit": [0, 0],
             "class": "macro"
@@ -52,7 +52,7 @@ function returnBlankTemplate() {
         },
         "nh4": {
             "color": "#7ea0b7",
-            "alias": "NH4",
+            "alias": "NH₄",
             "values": [],
             "limit": [1.5, 0.5],
             "class": "macro"
@@ -73,16 +73,16 @@ function returnBlankTemplate() {
         },
         "no2": {
             "color": "#01baef",
-            "alias": "NO2",
+            "alias": "NO₂",
             "values": [],
             "limit": [3.3, 0.08],
             "class": "macro"
         },
         "no3": {
             "color": "#577590",
-            "alias": "NO3",
+            "alias": "NO₃",
             "values": [],
-            "limit": [0, 0],
+            "limit": [40, 45],
             "class": "macro"
         },
         "ni": {
@@ -171,7 +171,7 @@ function returnBlankTemplate() {
         },
         "so4": {
             "color": "#cec3c1",
-            "alias": "SO4",
+            "alias": "SO₄",
             "values": [],
             "limit": [500, 100],
             "class": "macro"
