@@ -390,9 +390,9 @@ function addIndicator(indicatorName) {
         dataToAdd = arrValues.map(function (value) {
 
             // not add when not exist pdk
-            // if (!indicatorsValues[indicatorName]['limit'][limitNumber()]) {
-            //     return 0
-            // }
+            if (indicatorsValues[indicatorName]['limit'][limitNumber()] == 0 || indicatorName == "ph") {
+                return 0
+            }
 
             // limit number for using neccessary limit
             return (value / indicatorsValues[indicatorName]['limit'][limitNumber()]).toFixed(2);
