@@ -150,18 +150,20 @@ function init() {
 
         createCheckboxesDates(dateValues);
 
+
     }
 
     createCheckboxesIndicator(indicatorsValues);
     isFirstTimeLoad = false;
-    
+
     // disable button for first time load if first element is pH
-    if (firstElement == "ph"){
+    if (firstElement == "ph") {
         $("#recalcPDK").prop("disabled", true);
     }
     else {
         $("#recalcPDK").prop("disabled", false);
     }
+
 
 }
 
@@ -223,7 +225,7 @@ function addDate(dateValue, position) {
 
                     if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
 
-                        var pdkValue = indicatorValue / indicatorsValues[indicator]['limit']
+                        var pdkValue = indicatorValue / indicatorsValues[indicator]['limit'][limitNumber()]
 
                         dataset.data.splice(indexDate, 0, pdkValue);
 
@@ -241,6 +243,8 @@ function addDate(dateValue, position) {
         myBar.update();
 
     }
+
+
 };
 
 function removeIndicator(indicatorName) {
@@ -280,7 +284,7 @@ function createCheckboxesIndicator(arr) {
     $.each(arr, function (key, value) {
 
         isSelected = key == firstElement ? true : false;
-        targetList = value['class'] == "macro" ?  "microElements": "macroElements"
+        targetList = value['class'] == "macro" ? "microElements" : "macroElements"
 
         $('#' + targetList)
             .append($("<option></option>")
@@ -346,7 +350,7 @@ function createCheckboxesDates(arr) {
                 let position;
                 $(element).find('option:selected').each(function (index, value) {
                     if (option.value == $(value).attr("value")) {
-                        console.log(index);
+                        //console.log(index);
                         position = index;
                     }
                 })
@@ -385,8 +389,13 @@ function addIndicator(indicatorName) {
         // dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
         dataToAdd = arrValues.map(function (value) {
 
+            // not add when not exist pdk
+            // if (!indicatorsValues[indicatorName]['limit'][limitNumber()]) {
+            //     return 0
+            // }
+
             // limit number for using neccessary limit
-            return value / indicatorsValues[indicatorName]['limit'][limitNumber()];
+            return (value / indicatorsValues[indicatorName]['limit'][limitNumber()]).toFixed(2);
 
         });
 
@@ -419,8 +428,12 @@ function recalcPDK() {
 
     if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в ПДК") {
 
+        // rename axe y
+
         // clear limit line
         myBar.chart.annotation.options.annotations.pop();
+
+        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Единиц ПДК"
 
         document.getElementById("recalcPDK").innerHTML = "Вернуть значения";
 
@@ -435,17 +448,22 @@ function recalcPDK() {
                     if (name == indicatorsValues[indicator]['alias']) {
 
                         // for pH set pdk values none 
-                        if (name == "pH") {
+                        if (name == "pH" || indicatorsValues[indicator]['limit'][limitNumber()] == 0) {
                             return 0
                         }
 
-                        return value / indicatorsValues[indicator]['limit'][limitNumber()];
+                        return (value / indicatorsValues[indicator]['limit'][limitNumber()]).toFixed(2);
                     }
                 }
             });
 
         });
     } else {
+
+        // rename y axe label
+        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Значение показателя, мг/дм³";
+
+
         document.getElementById("recalcPDK").innerHTML = "Пересчитать в ПДК";
 
         setLine();
@@ -470,7 +488,9 @@ function recalcPDK() {
             //});
         });
     }
+
     myBar.update();
+
 }
 
 function pushElementsValues(ObjectForFill, index) {
@@ -511,7 +531,6 @@ function toggleTable() {
             }]
 
         };
-        $("#recalcPDK").prop("disabled", true);
         $('#lstIndicators').multiselect('disable', true);
         //$("#lstDates").multiselect('reset');
         $("#lstDates").empty();
@@ -519,6 +538,7 @@ function toggleTable() {
         $("#lstDates").multiselect('reload');
         init();
         $("#formIndicator").hide();
+        $("#recalcPDK").prop("disabled", true);
 
 
     }
@@ -580,9 +600,9 @@ function setLine() {
     if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть значения") {
 
         // disable button recalc pdk for pH
-        if (myBar.chart.config.data.datasets[0].label == "pH") {
-            $("#recalcPDK").prop("disabled", true);
-        }
+        // if (myBar.chart.config.data.datasets[0].label == "pH") {
+        //     $("#recalcPDK").prop("disabled", true);
+        // }
 
         let currentIndicatorAlias = myBar.chart.config.data.datasets[0].label
         let elements = returnBlankTemplate();
@@ -595,6 +615,8 @@ function setLine() {
 
         // if PDK is not defined 
         if (pdkValue == 0) {
+            // disable button recalc pdk
+            $("#recalcPDK").prop("disabled", true);
             pdkValue = NaN;
         }
 
