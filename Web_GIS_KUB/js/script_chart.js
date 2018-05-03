@@ -27,14 +27,21 @@ function modalListener() {
         $(".modal").css({ "display": "none" });
         $("#addInfo").off();
         $("#toggleTable").off();
-        $("#lstIndicators").multiselect('unload');
-        $("#lstDates").multiselect('unload');
+
+        // show list indicator after closing window
+        $("#formIndicator").show();
+
         $("#lstIndicators").multiselect('reset');
         $("#lstDates").multiselect('reset');
+        $("#lstIndicators").multiselect('unload');
+        $("#lstDates").multiselect('unload');
         $("#macroElements").empty();
         $("#microElements").empty();
         $("#lstDates").empty();
-        $("#lstDates").empty();
+
+
+
+        // reset variable
         isFirstTimeLoad = true;
 
     });
@@ -108,7 +115,7 @@ function init() {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Значение показателя, мг/дм³',
+                        labelString: firstElement == "rashod"?'Расход, м³/сек':'Значение показателя, мг/дм³',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",
@@ -294,6 +301,8 @@ function createCheckboxesIndicator(arr) {
 
     });
 
+    
+
     $('#lstIndicators').multiselect({
         columns: 5,
         onOptionClick: function (element, option) {
@@ -304,6 +313,10 @@ function createCheckboxesIndicator(arr) {
             }
         }
     });
+
+
+    // need to show if close modal window after showing "rashod" data
+    $('#lstIndicators').multiselect('disable', false);
 
 }
 
@@ -525,8 +538,6 @@ function toggleTable() {
             datasets: [{
                 label: indicatorsValues[firstElement]['alias'],
                 backgroundColor: indicatorsValues[firstElement]['color'],
-                borderColor: window.chartColors.red,
-                borderWidth: 1,
                 data: indicatorsValues[firstElement]['values']
             }]
 
