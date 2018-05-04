@@ -177,6 +177,21 @@ html, body {
 	background-color: #000666;
 	background-color: rgba(102,102,102,0.80);	
 }
+#FindBut{
+	position: absolute;
+    top: 244px;
+    left: 0px;
+    z-index: 50;
+	padding: 2px;
+	height: 40px;
+	width: 40px;
+	border-radius: 0px;
+	border-color: rgba(102,102,102,0.80);
+	border-style: solid;
+	border-width: 1px;
+	background-color: #000666;
+	background-color: rgba(102,102,102,0.80);	
+}
 .esriLayerList .esriContainer {
 	background-color: #ffebcc;
 	border-color: #000000;

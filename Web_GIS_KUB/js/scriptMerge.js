@@ -10,6 +10,7 @@ require([
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
 	"esri/tasks/GenerateRendererParameters", "esri/tasks/GenerateRendererTask",
 	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
+	"esri/tasks/FindTask", "esri/tasks/FindParameters",
 
 	"esri/TimeExtent", "esri/dijit/TimeSlider",
 	"dojo/_base/array",
@@ -32,6 +33,7 @@ require([
 	ClassBreaksDefinition, AlgorithmicColorRamp,
 	GenerateRendererParameters, GenerateRendererTask,
 	IdentifyTask, IdentifyParameters,
+	FindTask, FindParameters,
 
 	TimeExtent, TimeSlider,
 	arrayUtils,
@@ -66,6 +68,7 @@ require([
 		var selectedInfoNumber;
 		var identifyResult;
 		var identifyTask, identifyParams;
+		var findParams, findTask;
 		var massPointLabels = ["Отвалы", "Изливы", "Родники"];
 		var identificationLayerId;
 
@@ -315,6 +318,32 @@ require([
 			}
 		});
 
+		// Панель поиска
+		on(dom.byId("FindBut"), "click", function () {
+			if (dom.byId('rightPanel').style.display == 'none') {
+				dom.byId('rightPanel').style.display = 'block';
+				dom.byId('dMeasurePane').style.display = 'none';
+				dom.byId('layerListDom').style.display = 'none';
+				dom.byId('caseTitlePaneBM').style.display = 'none';
+				document.getElementById('map').style.right = '290px';
+				mMeasure.setTool("area", false);
+				mMeasure.setTool("distance", false);
+				mMeasure.setTool("location", false);
+				mMeasure.clearResult();
+				singleton.sayHello(findParams,findTask);
+			} else {
+				dom.byId('rightPanel').style.display = 'none';
+				document.getElementById('map').style.right = '40px';
+				document.getElementById('rightPane').innerHTML = '';
+				document.getElementById('featureCount').innerHTML = 'Окно поиска';
+				map.graphics.clear();
+				document.getElementById('clearSelBut').style.display = 'none';
+				document.getElementById('previous').style.display = 'none';
+				document.getElementById('next').style.display = 'none';
+				cursorOut();
+			}
+		});
+
 		// Функции для изменения указателя мыши
 		function cursorOver() { map.setMapCursor("help"); };
 		function cursorOut() { map.setMapCursor("default"); };
@@ -376,6 +405,11 @@ require([
 			identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
 			identifyParams.width = map.width;
 			identifyParams.height = map.height;
+
+			// find tasks
+			findTask = new FindTask("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/");
+
+			findParams = new FindParameters();
 
 
 		}
