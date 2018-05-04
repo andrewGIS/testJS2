@@ -24,9 +24,9 @@ function returnBlankTemplate() {
         },
         "ai": {
             "color": "#ba5a31",
-            "alias": "AI",
+            "alias": "Al",
             "values": [],
-            "limit": [0, 0],
+            "limit": [0.2, 0.04],
             "class": "micro"
         },
         "pb": {
