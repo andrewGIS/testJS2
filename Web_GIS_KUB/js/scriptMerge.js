@@ -330,12 +330,13 @@ require([
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
-				singleton.sayHello(findParams,findTask);
+				finder.copyVars(findParams,findTask,map);
+				finder.builtFinder();
 			} else {
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
 				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Окно поиска';
+				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				map.graphics.clear();
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
