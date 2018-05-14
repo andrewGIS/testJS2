@@ -330,7 +330,7 @@ require([
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
-				finder.copyVars(findParams,findTask,map);
+				finder.copyVars(findParams, findTask, map, new Graphic(), setSelectionSymbol("point"), setSelectionSymbol("polygon"), setSelectionSymbol("polyline"));
 				finder.builtFinder();
 			} else {
 				dom.byId('rightPanel').style.display = 'none';
@@ -733,9 +733,8 @@ require([
 			// set point symbol
 			switch (typeGeometry) {
 				case "point":
-					var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+					return new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
 						new Color([0, 0, 0]), 1.5), new Color([248, 0, 0, 0.8]));
-					return markerSymbol;
 
 				case "polygon":
 					return new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
