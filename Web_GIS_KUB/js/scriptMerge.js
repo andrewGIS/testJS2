@@ -338,10 +338,21 @@ require([
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				map.graphics.clear();
+				$("#pager").html("<button id='previous' title='Предыдущий' style='height: 25px; width:45px; display: none;'>" +
+					"<img src='images/arrow_previous.png' style='width: 20px; height: 20px;'>" +
+					"</button>" +
+					"<button id='next' title='Следующий' style='height: 25px; width:45px; display: none;'>" +
+					"<img src='images/arrow_next.png' style='width: 20px; height: 20px;'>" +
+					"</button>" +
+					"<button id='clearSelBut' title='Очистить выборку' style='height: 25px; width:45px; display: none;'>" +
+					"<img src='images/clear_select.png' style='width: 20px; height: 20px;'>" +
+					"</button>")
 				document.getElementById('clearSelBut').style.display = 'none';
 				document.getElementById('previous').style.display = 'none';
 				document.getElementById('next').style.display = 'none';
+				finder.clearFinder();
 				cursorOut();
+
 			}
 		});
 

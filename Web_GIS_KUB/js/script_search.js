@@ -17,12 +17,14 @@ var finder = function () {
 
     // построение окна поиска
     function builtFinder() {
-        $('#featureCount').html("Окно поиска");
-        $("#rightPane").html("Текст для поиска: <input type='text' id='searchText' size='15' value='Введите название' /><button id='runSearch'>Запуск поиска</button><div id='tblSearch'></div>");
+        $('#featureCount').html("Панель поиска <style align='center'>");
+        //$("#rightPane").html("<input type='text' id='searchText' size='30' placeholder = 'Введите искомое значение'/><button id='runSearch' class = 'modalButton'>Запуск поиска</button><button id='clearSearch' class = 'modalButton'>Очистить результаты</button><div id='tblSearch'></div>");
+        $("#pager").html("<input type='text' id='searchText' placeholder = 'Введите искомое значение'/><button id='runSearch' class = 'modalButton findButton'>Запуск поиска</button><button id='clearSearch' class = 'modalButton findButton'>Очистить результаты</button><div id='tblSearch'></div>");
 
         //$("#executeFind").on('click',executeFind);
         //$("#searchText").on('input', executeFind);
         $("#runSearch").on('click', executeFind);
+        $("#clearSearch").on('click', clearResult);
     }
 
     // Выполнение поиска
@@ -32,7 +34,7 @@ var finder = function () {
         //fParamsCopy.layerIds = [4, 6, 7, 12, 19, 21];
         fParamsCopy.returnGeometry = true;
         //fParms.searchFields = ["*"];
-        fParamsCopy.searchFields = ["name","nazvanie","bassin","river","sem9"];
+        fParamsCopy.searchFields = ["name", "nazvanie", "bassin", "river", "sem9"];
         fTaskCopy.execute(fParamsCopy, showResults);
         //showResults();
         //console.log('Hello');
@@ -40,14 +42,14 @@ var finder = function () {
 
     // Вывод результатов
     function showResults(results) {
-        $('#featureCount').html("Найдено " + results.length + " объектов");
+        $('#featureCount').html("Найдено объектов: " + results.length);
         $("#tblSearch").empty();
         console.log(results);
         findRes = results;
         $.each(results, function (key, value) {
-            $("#tblSearch").append("<tr><td>" + value.value + "</td><td>" + value.layerName + "</td><td><input id =" + key + " type='button' value='Find'/></td></tr>");
+            $("#tblSearch").append("<tr class = 'rawResult'><td class = 'resObjName'>" + value.value + "</td><td class = = 'resLayerName'> Слой: " + value.layerName + "</td><td><input id =" + key + " type='button' value='Приблизить к объекту' class = 'modalButton zoomButtonResult'/></td></tr>");
         })
-        $("#tblSearch :input").on("click", zoomToObject, );
+        $("#tblSearch :input").on("click", zoomToObject);
         //$("#tblSearch button").on('click',zoomToObject())
     }
 
@@ -80,18 +82,27 @@ var finder = function () {
 
     }
 
+    function clearResult() {
+        $("#tblSearch").html("");
+        $('#featureCount').html("Панель поиска");
+        $("#searchText").val("");
+        mapCopy.graphics.clear();
+
+    }
+
     function clearFinder() {
 
-    //    graphicCopy, pointSymbolCopy, polySymbolCopy, polylineSymbolCopy = null;
-    //    fTaskCopy, fParamsCopy, mapCopy = null;
-       findRes = null;
-//
-//
+        //    graphicCopy, pointSymbolCopy, polySymbolCopy, polylineSymbolCopy = null;
+        //    fTaskCopy, fParamsCopy, mapCopy = null;
+        findRes = null;
+        //
+        //
     }
 
     // Внешнее API
     return {
         builtFinder: builtFinder,
-        copyVars: copyVars
+        copyVars: copyVars,
+        clearFinder: clearFinder
     }
 }()

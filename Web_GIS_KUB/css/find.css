@@ -1,0 +1,31 @@
+#searchText{
+  outline: none;
+	color: gray;
+	text-align: center;
+	cursor: inherit;
+  padding: .1em .8em;
+	border: none;
+	outline: none;
+	border: 2px solid black;
+  border-radius: 4px;
+	margin: 0.3em;
+	width: 190px;
+}
+.findButton{
+  width: 180px;
+}
+.rawResult{
+	padding:0.1em;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+  border-radius: 4px;
+	margin: 5px;
+}
+.resObjName{
+	font-size: 14px;
+	font-weight: bold;
+}
+.zoomButtonResult{
+	margin-left: 0px;Rbg
+}
