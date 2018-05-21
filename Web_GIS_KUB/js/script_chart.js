@@ -294,7 +294,7 @@ function createCheckboxesIndicator(arr) {
         targetList = value['class'] == "macro" ? "microElements" : "macroElements"
 
         $('#' + targetList)
-            .append($("<option></option>")
+            .append($("<option style = 'background:black;'></option>")
                 .attr("value", key)
                 .attr("selected", isSelected)
                 .text(value['alias']));
@@ -311,6 +311,18 @@ function createCheckboxesIndicator(arr) {
             } else {
                 removeIndicator(option.value)
             }
+        }
+    });
+
+    // change background if possible to calc pdk
+    let elements = returnBlankTemplate();
+    $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
+        let element = value.firstChild.defaultValue;
+        if (elements[element]['limit'][limitNumber()]){
+            $(value).css("background-color","#c8ff49")
+        }
+        else {
+            $(value).css("background-color",'#f27e2b')
         }
     });
 

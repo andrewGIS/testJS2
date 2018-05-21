@@ -88,6 +88,16 @@ require([
 			Ediv3.id = "dijit_layout_ContentPane_3n";
 			var Ediv4 = document.getElementById("dijit_layout_ContentPane_4");
 			Ediv4.id = "dijit_layout_ContentPane_4n";
+
+			// listen toggle menu
+			$("#rightPanelSet").on("click", "li", function () {
+				console.log(this.children[0].id);
+				//console.log(this.firstElementChild.children[0].id);
+				//$(this.children[0]).toggleClass("activeButton");
+
+			});
+
+
 			mMeasure.startup();
 
 			initFunctionallity();
@@ -95,7 +105,6 @@ require([
 			assertClick();
 
 			modalListener();
-
 
 		});
 
@@ -167,6 +176,7 @@ require([
 			}],
 		}, "layerListDom");
 		layerList.startup();
+		//$("#layerListDom").addClass("container");
 
 		layerList.on('load', function () {
 			dom.byId("layerListDom").style.display = 'none';
@@ -199,28 +209,32 @@ require([
 			}
 		};
 
+
+		//Right panel menu
+		// $( function() {
+		// 	$( "#tabs" ).tabs();
+		//   } );
+
+
+
 		//Кнопка управление слоями
 		on(dom.byId("LayList"), "click", function () {
 			if (dom.byId('layerListDom').style.display == 'none') {
-				dom.byId('layerListDom').style.display = 'block';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
-				dom.byId('dMeasurePane').style.display = 'none';
-				mMeasure.setTool("area", false);
-				mMeasure.setTool("distance", false);
-				mMeasure.setTool("location", false);
-				mMeasure.clearResult();
-				dom.byId('rightPanel').style.display = 'none';
-				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
-				cursorOut();
-				map.graphics.clear();
+
+				/*baron('.wrapper');*/
+
+				$(this).toggleClass("activeButton");
+				$("#layerListDom").show();
+				$("#layerListDom").hover(function () {
+					$(this).fadeTo(1000, 0.9);
+				}, function () {
+					$(this).fadeTo(1000, 0.05);
+				})
 			} else {
-				dom.byId('layerListDom').style.display = 'none';
+				$("#layerListDom").hide();
+				$("#layerListDom").off("mouseenter mouseleave");
+				$("#layerListDom").css('opacity', '0.9');
+				$(this).toggleClass("activeButton");
 			}
 		});
 
@@ -228,22 +242,15 @@ require([
 		on(dom.byId("BaseMapChange"), "click", function () {
 			if (dom.byId('caseTitlePaneBM').style.display == 'none') {
 				dom.byId('caseTitlePaneBM').style.display = 'block';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('dMeasurePane').style.display = 'none';
+				$("#searchPanel, #rightPanel, #dMeasurePane").hide();
+				//dom.byId('dMeasurePane').style.display = 'none';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
 				cursorOut();
-				map.graphics.clear();
 			} else {
 				dom.byId('caseTitlePaneBM').style.display = 'none';
 			}
@@ -253,17 +260,10 @@ require([
 		on(dom.byId("MeasureBut"), "click", function () {
 			if (dom.byId('dMeasurePane').style.display == 'none') {
 				dom.byId('dMeasurePane').style.display = 'block';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
-				dom.byId('rightPanel').style.display = 'none';
+				$("#searchPanel, #rightPanel, #caseTitlePaneBM").hide();
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				mapClick.remove();
 				cursorOut();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
 				map.graphics.clear();
 			} else {
 				dom.byId('dMeasurePane').style.display = 'none';
@@ -285,9 +285,7 @@ require([
 		on(dom.byId("InfoBut"), "click", function () {
 			if (dom.byId('rightPanel').style.display == 'none') {
 				dom.byId('rightPanel').style.display = 'block';
-				dom.byId('dMeasurePane').style.display = 'none';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
+				$("#searchPanel, #dMeasurePane, #caseTitlePaneBM").hide();
 				document.getElementById('map').style.right = '290px';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
@@ -311,6 +309,7 @@ require([
 
 		// Button for show photos
 		on(dom.byId("PhotosBut"), "click", function () {
+			$(this).toggleClass("activeButton");
 			if (PhotoLayer.visible == false) {
 				PhotoLayer.show();
 			} else {
@@ -320,11 +319,16 @@ require([
 
 		// Панель поиска
 		on(dom.byId("FindBut"), "click", function () {
-			if (dom.byId('rightPanel').style.display == 'none') {
-				dom.byId('rightPanel').style.display = 'block';
-				dom.byId('dMeasurePane').style.display = 'none';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
+			//$("#searchPanel").toggleClass("activeTab");
+			if (dom.byId('searchPanel').style.display == 'none') {
+				map.graphics.clear();
+				dom.byId('searchPanel').style.display = 'block';
+				$("#rightPanel, #dMeasurePane, #caseTitlePaneBM").hide();
+				$("#rightPanel").html("");
+				$("#featureCount").html('Кликните по объекту для идентификации');
+				$('#clearSelBut').hide();
+				$('#previous').hide();
+				$('#next').hide();
 				document.getElementById('map').style.right = '290px';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
@@ -333,26 +337,17 @@ require([
 				finder.copyVars(findParams, findTask, map, new Graphic(), setSelectionSymbol("point"), setSelectionSymbol("polygon"), setSelectionSymbol("polyline"));
 				finder.builtFinder();
 			} else {
-				dom.byId('rightPanel').style.display = 'none';
+				dom.byId('searchPanel').style.display = 'none';
+				//dom.byId('rightPanel').style.display = 'block';
 				document.getElementById('map').style.right = '40px';
 				document.getElementById('rightPane').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				map.graphics.clear();
-				$("#pager").html("<button id='previous' title='Предыдущий' style='height: 25px; width:45px; display: none;'>" +
-					"<img src='images/arrow_previous.png' style='width: 20px; height: 20px;'>" +
-					"</button>" +
-					"<button id='next' title='Следующий' style='height: 25px; width:45px; display: none;'>" +
-					"<img src='images/arrow_next.png' style='width: 20px; height: 20px;'>" +
-					"</button>" +
-					"<button id='clearSelBut' title='Очистить выборку' style='height: 25px; width:45px; display: none;'>" +
-					"<img src='images/clear_select.png' style='width: 20px; height: 20px;'>" +
-					"</button>")
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
+				$('#clearSelBut').hide();
+				$('#previous').hide();
+				$('#next').hide();
 				finder.clearFinder();
 				cursorOut();
-
 			}
 		});
 
@@ -756,6 +751,5 @@ require([
 					return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([102, 0, 0, 1]), 7.5)
 			}
 		}
-
 
 	});
