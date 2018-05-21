@@ -38,17 +38,19 @@ html, body {
 	text-shadow: 2px 2px 5px white;
 }
 #HomeButton {
-    position: absolute;
+    position: relative;
     top: 0px;
     left: 0px;
-	z-index: 50;
+	  z-index: 50;
 	height: 40px;
 	width: 40px;
 }
+#HomeButton .home:hover {
+  background-color: #000000;
+}
 .HomeButton .home {
-    padding:2px;
     width: 36px;
-	height: 35px;
+	height: 36px;
 	-webkit-border-radius:0px;
 	-moz-border-radius:0px;
 	-o-border-radius:0px;
@@ -65,9 +67,9 @@ html, body {
 	font-size: 14px;	
 }
 #TitlePaneBM{
-    position: absolute;    
+  position: absolute;    
 	width:250px;		
-    z-index: 5;	
+  z-index: 5;	
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	font-size: 14px;
 	border-color: #000000;
@@ -76,66 +78,10 @@ html, body {
 	border-radius: 0px;
 	background: #ffebcc;
 }
-#LayList{
+#dMeasurePane{	
 	position: absolute;
-    top: 40px;
-    left: 0px;
-    z-index: 50;
 	padding: 2px;
-	height: 40px;
-	width: 40px;
-	border-radius: 0px;
-	border-color: rgba(102,102,102,0.80);
-	border-style: solid;
-	border-width: 1px;
-	background-color: #000666;
-	background-color: rgba(102,102,102,0.80);	
-}
-#layerListDom{	
-	position: absolute;	
-    top: 80px;
-	right: 40px;
-	bottom: 20px;	
-	z-index: 50;		
-	border-radius: 0px;
-	overflow-y: auto;
-	display: none;
-}
-#BaseMapChange{
-	position: absolute;
-    top: 81px;
-    left: 0px;
-    z-index: 50;
-	padding: 2px;
-	height: 40px;
-	width: 40px;
-	border-radius: 0px;
-	border-color: rgba(102,102,102,0.80);
-	border-style: solid;
-	border-width: 1px;
-	background-color: #000666;
-	background-color: rgba(102,102,102,0.80);	
-}
-#MeasureBut{
-	position: absolute;
-    top: 122px;
-    left: 0px;
-    z-index: 50;
-	padding: 2px;
-	height: 40px;
-	width: 40px;
-	border-radius: 0px;
-	border-color: rgba(102,102,102,0.80);
-	border-style: solid;
-	border-width: 1px;
-	background-color: #000666;
-	background-color: rgba(102,102,102,0.80);	
-}
-#dMeasurePane{
-	display: none;	
-    position: absolute;
-	padding: 2 px;    
-	top: 162px;
+	top: 162px;  
     right: 40px;
 	width:250px;	
     z-index: 50;	
@@ -147,36 +93,6 @@ html, body {
 	border-radius: 0px;
 	background: #ffebcc;
 }
-#InfoBut{
-	position: absolute;
-    top: 163px;
-    left: 0px;
-    z-index: 50;
-	padding: 2px;
-	height: 40px;
-	width: 40px;
-	border-radius: 0px;
-	border-color: rgba(102,102,102,0.80);
-	border-style: solid;
-	border-width: 1px;
-	background-color: #000666;
-	background-color: rgba(102,102,102,0.80);
-}
-#PhotosBut{
-	position: absolute;
-    top: 204px;
-    left: 0px;
-    z-index: 50;
-	padding: 2px;
-	height: 40px;
-	width: 40px;
-	border-radius: 0px;
-	border-color: rgba(102,102,102,0.80);
-	border-style: solid;
-	border-width: 1px;
-	background-color: #000666;
-	background-color: rgba(102,102,102,0.80);	
-}
 .esriLayerList .esriContainer {
 	background-color: #ffebcc;
 	border-color: #000000;
@@ -184,8 +100,8 @@ html, body {
 	border-width: 1px;
 	border-radius: 0px;
 	color: #000000;
-	overflow-x:auto;
-    overflow-y:auto;
+	/*overflow-x:auto;
+  overflow-y:auto;*/
 	width: 250px;
 	bottom: 0px;
 	font-family: Corbel;
@@ -193,9 +109,6 @@ html, body {
 }
 .esriLayerList .esriTabContainer {
 	display: block;
-}
-.esriLayerList .esriHasTabContent.esriListVisible .esriToggleButton {
-	display: none;
 }
 #rightPanelSet{
 	right: 0px;
@@ -210,7 +123,7 @@ html, body {
 	overflow: auto;
 	position: absolute;
 }
-#rightPanel{
+.rightPanel{
     width: 250px;
     top: 40px;
 	right: 40px;
@@ -344,4 +257,112 @@ html, body {
 #container2{
     position: relative;
     float: right;
+}
+#InfoBut:disabled{
+	opacity:0.6;
+}
+#FindBut:disabled{
+	opacity:0.6;
+}
+.mainButton{
+	margin-top: 2px;
+	position: relative;
+  left: 0px;
+  z-index: 50;
+	padding: 2px;
+	height: 40px;
+	width: 40px;
+	border-radius: 0px;
+	border-color: rgba(102,102,102,0.80);
+	border-style: solid;
+	border-width: 1px;
+	background-color: #000666;
+	background-color: rgba(102,102,102,0.80);	
+}
+.mainButton:active{
+	 position: relative;
+  cursor: default;
+  top: 1px;
+  border: 1px solid rgba(211,211,211,1);
+  color: rgba(114,114,114,1);
+  background: rgba(247,247,247,1);
+  -webkit-box-shadow: 0 0 1px 1px rgba(255,255,255,0.8) inset, 0 1px 0 0 rgba(0,0,0,0.298039) inset;
+  box-shadow: 0 0 1px 1px rgba(255,255,255,0.8) inset, 0 1px 0 0 rgba(0,0,0,0.298039) inset;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+.mainButton:hover{
+	background-color: black;
+	cursor:pointer;
+}
+.activeButton{
+	background-color: #000000;
+}
+#layerListDom{	
+	position: absolute;	
+  	top: 160px;
+	left: 20px;
+	bottom: 80px;	
+	z-index: 50;		
+	border-radius: 0px;
+	overflow-y: scroll;
+	display: none;
+}
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+
+/* scrolling  */
+/*#layerListDom{	
+	position: relative;	
+  	/*top: 0px;
+	left: 20px;
+	bottom: 80px;	
+	z-index: 50;		
+	border-radius: 0px;
+	overflow-y: scroll;
+	display: none;
+}*/
+.wrapper {
+	position: absolute;
+	height: 700px;
+	width: 400px;
+	top: 160px;
+	left: 2px;
+	bottom: 80px;	
+	z-index: 500;
+	overflow: hidden;
+}
+.scroller {
+	display: inline-block;
+	position: absolute;
+    height: 100%;
+    /*overflow-y: scroll;*/
+}
+.scroller::-webkit-scrollbar { /* Preventing webkit bug of horizontal scrolling */
+    width: 0;
+}
+.scroller__bar { /* The bar. You should define width, right and background */
+	position: absolute;    
+	right: 0;
+    /*z-index: 5000;*/
+    /*left: 100px;*/
+    width: 100px;
+    background:black;
+}
+.container { /* Data wrapper */
+    overflow: hidden; /* For possible margin collapse removing */
 }

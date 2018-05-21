@@ -10,6 +10,7 @@ require([
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
 	"esri/tasks/GenerateRendererParameters", "esri/tasks/GenerateRendererTask",
 	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
+	"esri/tasks/FindTask", "esri/tasks/FindParameters",
 
 	"esri/TimeExtent", "esri/dijit/TimeSlider",
 	"dojo/_base/array",
@@ -32,6 +33,7 @@ require([
 	ClassBreaksDefinition, AlgorithmicColorRamp,
 	GenerateRendererParameters, GenerateRendererTask,
 	IdentifyTask, IdentifyParameters,
+	FindTask, FindParameters,
 
 	TimeExtent, TimeSlider,
 	arrayUtils,
@@ -66,6 +68,7 @@ require([
 		var selectedInfoNumber;
 		var identifyResult;
 		var identifyTask, identifyParams;
+		var findParams, findTask;
 		var massPointLabels = ["Отвалы", "Изливы", "Родники"];
 		var identificationLayerId;
 
@@ -85,6 +88,16 @@ require([
 			Ediv3.id = "dijit_layout_ContentPane_3n";
 			var Ediv4 = document.getElementById("dijit_layout_ContentPane_4");
 			Ediv4.id = "dijit_layout_ContentPane_4n";
+
+			// listen toggle menu
+			$("#rightPanelSet").on("click", "li", function () {
+				console.log(this.children[0].id);
+				//console.log(this.firstElementChild.children[0].id);
+				//$(this.children[0]).toggleClass("activeButton");
+
+			});
+
+
 			mMeasure.startup();
 
 			initFunctionallity();
@@ -92,7 +105,6 @@ require([
 			assertClick();
 
 			modalListener();
-
 
 		});
 
@@ -164,6 +176,7 @@ require([
 			}],
 		}, "layerListDom");
 		layerList.startup();
+		//$("#layerListDom").addClass("container");
 
 		layerList.on('load', function () {
 			dom.byId("layerListDom").style.display = 'none';
@@ -196,28 +209,32 @@ require([
 			}
 		};
 
+
+		//Right panel menu
+		// $( function() {
+		// 	$( "#tabs" ).tabs();
+		//   } );
+
+
+
 		//Кнопка управление слоями
 		on(dom.byId("LayList"), "click", function () {
 			if (dom.byId('layerListDom').style.display == 'none') {
-				dom.byId('layerListDom').style.display = 'block';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
-				dom.byId('dMeasurePane').style.display = 'none';
-				mMeasure.setTool("area", false);
-				mMeasure.setTool("distance", false);
-				mMeasure.setTool("location", false);
-				mMeasure.clearResult();
-				dom.byId('rightPanel').style.display = 'none';
-				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
-				cursorOut();
-				map.graphics.clear();
+
+				/*baron('.wrapper');*/
+
+				$(this).toggleClass("activeButton");
+				$("#layerListDom").show();
+				$("#layerListDom").hover(function () {
+					$(this).fadeTo(1000, 0.9);
+				}, function () {
+					$(this).fadeTo(1000, 0.05);
+				})
 			} else {
-				dom.byId('layerListDom').style.display = 'none';
+				$("#layerListDom").hide();
+				$("#layerListDom").off("mouseenter mouseleave");
+				$("#layerListDom").css('opacity', '0.9');
+				$(this).toggleClass("activeButton");
 			}
 		});
 
@@ -225,22 +242,15 @@ require([
 		on(dom.byId("BaseMapChange"), "click", function () {
 			if (dom.byId('caseTitlePaneBM').style.display == 'none') {
 				dom.byId('caseTitlePaneBM').style.display = 'block';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('dMeasurePane').style.display = 'none';
+				$("#searchPanel, #rightPanel, #dMeasurePane").hide();
+				//dom.byId('dMeasurePane').style.display = 'none';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				mapClick.remove();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
 				cursorOut();
-				map.graphics.clear();
 			} else {
 				dom.byId('caseTitlePaneBM').style.display = 'none';
 			}
@@ -250,17 +260,10 @@ require([
 		on(dom.byId("MeasureBut"), "click", function () {
 			if (dom.byId('dMeasurePane').style.display == 'none') {
 				dom.byId('dMeasurePane').style.display = 'block';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
-				dom.byId('rightPanel').style.display = 'none';
+				$("#searchPanel, #rightPanel, #caseTitlePaneBM").hide();
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				mapClick.remove();
 				cursorOut();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
 				map.graphics.clear();
 			} else {
 				dom.byId('dMeasurePane').style.display = 'none';
@@ -282,9 +285,7 @@ require([
 		on(dom.byId("InfoBut"), "click", function () {
 			if (dom.byId('rightPanel').style.display == 'none') {
 				dom.byId('rightPanel').style.display = 'block';
-				dom.byId('dMeasurePane').style.display = 'none';
-				dom.byId('layerListDom').style.display = 'none';
-				dom.byId('caseTitlePaneBM').style.display = 'none';
+				$("#searchPanel, #dMeasurePane, #caseTitlePaneBM").hide();
 				document.getElementById('map').style.right = '290px';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
@@ -308,10 +309,45 @@ require([
 
 		// Button for show photos
 		on(dom.byId("PhotosBut"), "click", function () {
+			$(this).toggleClass("activeButton");
 			if (PhotoLayer.visible == false) {
 				PhotoLayer.show();
 			} else {
 				PhotoLayer.hide();
+			}
+		});
+
+		// Панель поиска
+		on(dom.byId("FindBut"), "click", function () {
+			//$("#searchPanel").toggleClass("activeTab");
+			if (dom.byId('searchPanel').style.display == 'none') {
+				map.graphics.clear();
+				dom.byId('searchPanel').style.display = 'block';
+				$("#rightPanel, #dMeasurePane, #caseTitlePaneBM").hide();
+				$("#rightPanel").html("");
+				$("#featureCount").html('Кликните по объекту для идентификации');
+				$('#clearSelBut').hide();
+				$('#previous').hide();
+				$('#next').hide();
+				document.getElementById('map').style.right = '290px';
+				mMeasure.setTool("area", false);
+				mMeasure.setTool("distance", false);
+				mMeasure.setTool("location", false);
+				mMeasure.clearResult();
+				finder.copyVars(findParams, findTask, map, new Graphic(), setSelectionSymbol("point"), setSelectionSymbol("polygon"), setSelectionSymbol("polyline"));
+				finder.builtFinder();
+			} else {
+				dom.byId('searchPanel').style.display = 'none';
+				//dom.byId('rightPanel').style.display = 'block';
+				document.getElementById('map').style.right = '40px';
+				document.getElementById('rightPane').innerHTML = '';
+				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+				map.graphics.clear();
+				$('#clearSelBut').hide();
+				$('#previous').hide();
+				$('#next').hide();
+				finder.clearFinder();
+				cursorOut();
 			}
 		});
 
@@ -376,6 +412,11 @@ require([
 			identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
 			identifyParams.width = map.width;
 			identifyParams.height = map.height;
+
+			// find tasks
+			findTask = new FindTask("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/");
+
+			findParams = new FindParameters();
 
 
 		}
@@ -698,9 +739,8 @@ require([
 			// set point symbol
 			switch (typeGeometry) {
 				case "point":
-					var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+					return new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
 						new Color([0, 0, 0]), 1.5), new Color([248, 0, 0, 0.8]));
-					return markerSymbol;
 
 				case "polygon":
 					return new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
@@ -711,6 +751,5 @@ require([
 					return new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([102, 0, 0, 1]), 7.5)
 			}
 		}
-
 
 	});
