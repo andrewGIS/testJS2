@@ -10,64 +10,47 @@ var charTitle;
 var color;// variable from samples with charts
 var colorNames;// variable from samples with charts
 var dataForChartRaw;// variable from samples with charts
-
+var currentLyrID; // source layer , used for choose necessary pdk limit
+var limitLine;// variable for store limit pdk value when only one indicator on graph
+var isFirstTimeLoad = true;// is first time to load 
 
 function modalListener() {
     // assert event handler for dom elements
 
-    $(".close-modal, .modal-sandbox").click(function () {
+    // modified this for scroolling list of elements
+    // now only click on close modal closing modal window
+    // $(".close-modal, .modal-sandbox").click(function () {
+    $(".close-modal").click(function () {
         $('#modal-canvas').remove();
+        $('#container').empty();
         $('#container').append('<canvas id="modal-canvas"><canvas>');
-        $("#recalcPDK").off();
-        $("#toggleChart").off();
-        $("#modal-listIndicator").off();
-        $("#modal-listDates").off();
         $(".modal").css({ "display": "none" });
-        document.getElementById("modal-listDates").innerHTML = "";
-        document.getElementById("modal-listIndicator").innerHTML = "";
         $("#addInfo").off();
         $("#toggleTable").off();
+
+        // show list indicator after closing window
+        $("#formIndicator").show();
+
+        $("#lstIndicators").multiselect('reset');
+        $("#lstDates").multiselect('reset');
+        $("#lstIndicators").multiselect('unload');
+        $("#lstDates").multiselect('unload');
+        $("#macroElements").empty();
+        $("#microElements").empty();
+        $("#lstDates").empty();
+
+
+
+        // reset variable
+        isFirstTimeLoad = true;
+
     });
 
     // listener for buttons
-    document.getElementById("recalcPDK").addEventListener('click', recalcPDK);
-    document.getElementById("toggleChart").addEventListener('click', toggleChart);
-    document.getElementById("toggleTable").addEventListener('click', toggleTable);
+    $("#recalcPDK").on('click', recalcPDK);
+    $("#showElements").on('click', toggleTable);
+    $("#showFlowRate").on('click', toggleTable);
 
-
-    // listener for checkbox of indicators
-    document.getElementById("modal-listIndicator").addEventListener('click', function (e) {
-
-        if (e.target.defaultValue && e.target.checked) {
-
-            addIndicator(e.target.defaultValue);
-
-        } else if (e.target.defaultValue && !e.target.checked) {
-
-            removeIndicator(e.target.defaultValue);
-
-        }
-    })
-
-    // listener for checkbox of dates
-    document.getElementById("modal-listDates").addEventListener('click', function (e) {
-
-        if (e.target.defaultValue && e.target.checked) {
-            // position of input date (when more then one elements is deleted)
-
-            var checkedCheckboxIndex = $('input[name=dates]:checked').map(function (index, obj) {
-                if (obj.value == e.target.defaultValue) {
-                    return index;
-                }
-            })
-            addDate(e.target.defaultValue, checkedCheckboxIndex[0]);
-
-        } else if (e.target.defaultValue && !e.target.checked) {
-
-            removeDate(e.target.defaultValue);
-
-        }
-    })
 }
 
 function formateDate(dateValue) {
@@ -80,22 +63,37 @@ function formateDate(dateValue) {
     return new Date(parseInt(dateValue)).toLocaleString("ru", options);
 }
 
-
 function init() {
     // create data for Chart and show modal window and create check boxes
     $("#modal-name").css({ "display": "block" });
+
 
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
         datasets: [{
             label: indicatorsValues[firstElement]['alias'],
             backgroundColor: indicatorsValues[firstElement]['color'],
-            borderColor: window.chartColors.red,
-            borderWidth: 1,
             data: indicatorsValues[firstElement]['values']
         }]
 
     };
+
+    // set limitLine
+    limitLine = [{
+        type: 'line',
+        mode: 'horizontal',
+        scaleID: 'y-axis-0',
+        value: indicatorsValues[firstElement]['limit'][limitNumber()],
+        borderWidth: 5,
+        borderColor: 'red',
+        label: {
+            backgroundColor: "red",
+            content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
+            enabled: true,
+            // for determination side of label above or below line
+            yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - indicatorsValues[firstElement]['limit'][limitNumber()] > 0 ? -10 : 10,
+        }
+    }];
 
 
     myBar = new Chart(targetCanvas, {
@@ -112,18 +110,73 @@ function init() {
                 text: charTitle,
                 fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                 fontSize: 16
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: firstElement == "rashod"?'Расход, м³/сек':'Значение показателя, мг/дм³',
+                        fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontSize: 14,
+                        fontStyle: "bold",
+                    },
+                    type: 'logarithmic',
+                    ticks: {
+                        callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
+                            return value.toFixed(3);//pass tick values as a string into Number function
+                        }
+                    },
+                    afterBuildTicks: function (axe) {
+                        let labelsCount = 3;
+                        axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
+
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Даты обследований',
+                        fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontSize: 14,
+                        fontStyle: "bold",
+                        padding: 4,
+                    }
+                }]
+
+            },
+            annotation: {
+                annotations: limitLine
             }
         }
     });
 
+
+
+    if (isFirstTimeLoad) {
+
+
+        createCheckboxesDates(dateValues);
+
+
+    }
+
     createCheckboxesIndicator(indicatorsValues);
-    createCheckboxesDates(dateValues);
+    isFirstTimeLoad = false;
+
+    // disable button for first time load if first element is pH
+    if (firstElement == "ph") {
+        $("#recalcPDK").prop("disabled", true);
+    }
+    else {
+        $("#recalcPDK").prop("disabled", false);
+    }
 
 
 }
 
-function loadModal(dataForChart) {
+function loadModal(dataForChart, layerID) {
     // calc variable for each record
+    currentLyrID = layerID;
     chartType = 'bar';
     dataForChartRaw = dataForChart;
     indicatorsValues = pushElementsValues(dataForChart[0], 1);
@@ -134,14 +187,15 @@ function loadModal(dataForChart) {
     targetCanvas = document.getElementById("modal-canvas").getContext("2d");
     firstElement = "ph";
     $("#recalcPDK").html("Пересчитать в ПДК");
-    $("#toggleTable").html("Данные по расходам");
     $("#recalcPDK").prop("disabled", false);
+    $("#showElements").prop("disabled", false);
     if (dataForChart.length > 1) {
-        $("#toggleTable").prop("disabled", false);
+        $("#showFlowRate").prop("disabled", false);
     }
     else {
-        $("#toggleTable").prop("disabled", true);
+        $("#showFlowRate").prop("disabled", true);
     }
+
     init();
 
 }
@@ -178,7 +232,7 @@ function addDate(dateValue, position) {
 
                     if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
 
-                        var pdkValue = indicatorValue / indicatorsValues[indicator]['limit']
+                        var pdkValue = indicatorValue / indicatorsValues[indicator]['limit'][limitNumber()]
 
                         dataset.data.splice(indexDate, 0, pdkValue);
 
@@ -196,8 +250,9 @@ function addDate(dateValue, position) {
         myBar.update();
 
     }
-};
 
+
+};
 
 function removeIndicator(indicatorName) {
 
@@ -209,9 +264,10 @@ function removeIndicator(indicatorName) {
             barChartData.datasets.splice(index, 1);
         }
     }
+
+    setLine();
     myBar.update();
 };
-
 
 function removeDate(dateValue) {
     // remove selected data from chart
@@ -228,35 +284,126 @@ function removeDate(dateValue) {
 };
 
 function createCheckboxesIndicator(arr) {
-    // create list of checkboxes for indicators (arr of data must be in specific view 
-    // and sorted by date)
-    var fldList = document.getElementById("modal-listIndicator");
-    for (indicator in arr) {
 
-        if (indicator == firstElement) {
-            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + ' checked="checked" id = ' + arr[indicator]["alias"] + ' />' + '<label for=' + arr[indicator]["alias"] + ' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
+    let isSelected;
+    let targetList;
+
+    $.each(arr, function (key, value) {
+
+        isSelected = key == firstElement ? true : false;
+        targetList = value['class'] == "macro" ? "microElements" : "macroElements"
+
+        $('#' + targetList)
+            .append($("<option style = 'background:black;'></option>")
+                .attr("value", key)
+                .attr("selected", isSelected)
+                .text(value['alias']));
+
+    });
+
+    
+
+    $('#lstIndicators').multiselect({
+        columns: 5,
+        onOptionClick: function (element, option) {
+            if (option.checked) {
+                addIndicator(option.value)
+            } else {
+                removeIndicator(option.value)
+            }
+        }
+    });
+
+    // change background if possible to calc pdk
+    let elements = returnBlankTemplate();
+    $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
+        let element = value.firstChild.defaultValue;
+        if (elements[element]['limit'][limitNumber()]){
+            $(value).css("background-color","#c8ff49")
         }
         else {
-            fldList.innerHTML += '<input type="checkbox" name="indicators" value=' + indicator + '  id = ' + arr[indicator]["alias"] + ' />' + '<label for=' + arr[indicator]["alias"] + ' class = "labelIndicators">' + arr[indicator]["alias"] + '</label>'
+            $(value).css("background-color",'#f27e2b')
         }
-    }
+    });
+
+
+    // need to show if close modal window after showing "rashod" data
+    $('#lstIndicators').multiselect('disable', false);
+
 }
 
 function createCheckboxesDates(arr) {
     // create list of checkboxes for dates (arr of data must be in specific view 
     // and sorted by date)
-    var fldList = document.getElementById("modal-listDates")
 
-    arr.forEach(function (e, index) {
+    var uniqYearList;
+    // uniq list of all years
+    uniqYearList = new Set(arr.map(function (e) { return new Date(e).getFullYear() }));
 
-        fldList.innerHTML += '<input type="checkbox" name="dates" value=' + e + ' checked="checked" id = ' + e + ' />' +
-            '<label for=' + e + ' class = "labelDates">' + formateDate(e) + '</label>'
+    // create drop lists by years
+    uniqYearList.forEach(function (value, v, k) {
 
-    })
+        $('#lstDates')
+            .append($("<optgroup></optgroup>")
+                .attr("id", "group" + value)
+                .attr("label", value));
+
+    });
+
+    // push values in neccesary group
+    $.each(arr, function (key, value) {
+
+        let isSelected = true;
+        let curYearId = new Date(value).getFullYear();
+
+        $('#group' + curYearId)
+            .append($("<option></option>")
+                .attr("value", value)
+                .attr("selected", isSelected)
+                .text(formateDate(value)));
+
+    });
+
+    // create multiselect
+    $('#lstDates').multiselect({
+        columns: 5,
+        selectGroup: true,
+        onOptionClick: function (element, option) {
+            //console.log(element);
+            if (option.checked) {
+                // position of element
+                let position;
+                $(element).find('option:selected').each(function (index, value) {
+                    if (option.value == $(value).attr("value")) {
+                        //console.log(index);
+                        position = index;
+                    }
+                })
+                addDate(option.value, position)
+            } else {
+                removeDate(option.value)
+            }
+        }
+    });
+
+
 
 }
 
 function addIndicator(indicatorName) {
+    // need to add only checked dates
+
+    // all checked dates indexes
+    let checkedDatesIndex = [];
+    $('#lstDates').find('option:selected').each(function (key, value) {
+        checkedDatesIndex.push(dateValues.indexOf(parseInt(value.value)));
+    })
+
+    // extract values 
+    let arrValues = checkedDatesIndex.map(function (index) {
+        return indicatorsValues[indicatorName]['values'][index]
+    })
+
     // add selected (clicked) indicator to chart
     let dataToAdd;
 
@@ -264,17 +411,26 @@ function addIndicator(indicatorName) {
 
     if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
 
-        dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
+        // dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
+        dataToAdd = arrValues.map(function (value) {
 
-            return value / indicatorsValues[indicatorName]['limit'];
+            // not add when not exist pdk
+            if (indicatorsValues[indicatorName]['limit'][limitNumber()] == 0 || indicatorName == "ph") {
+                return 0
+            }
+
+            // limit number for using neccessary limit
+            return (value / indicatorsValues[indicatorName]['limit'][limitNumber()]).toFixed(2);
 
         });
 
     } else {
 
-        dataToAdd = indicatorsValues[indicatorName]['values']
+        dataToAdd = arrValues;
 
     }
+
+    // need to add only checked data
 
     var newDataset = {
         label: indicatorsValues[indicatorName]['alias'],
@@ -285,12 +441,24 @@ function addIndicator(indicatorName) {
     };
 
     barChartData.datasets.push(newDataset);
+    setLine();
+
     myBar.update();
 };
 
 function recalcPDK() {
     // recalc data in pdk value (pdk must be setted in elements)
+    //console.log(currentLyrID);
+
+
     if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в ПДК") {
+
+        // rename axe y
+
+        // clear limit line
+        myBar.chart.annotation.options.annotations.pop();
+
+        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Единиц ПДК"
 
         document.getElementById("recalcPDK").innerHTML = "Вернуть значения";
 
@@ -304,20 +472,36 @@ function recalcPDK() {
 
                     if (name == indicatorsValues[indicator]['alias']) {
 
-                        return value / indicatorsValues[indicator]['limit'];
+                        // for pH set pdk values none 
+                        if (name == "pH" || indicatorsValues[indicator]['limit'][limitNumber()] == 0) {
+                            return 0
+                        }
+
+                        return (value / indicatorsValues[indicator]['limit'][limitNumber()]).toFixed(2);
                     }
                 }
             });
 
         });
     } else {
+
+        // rename y axe label
+        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Значение показателя, мг/дм³";
+
+
         document.getElementById("recalcPDK").innerHTML = "Пересчитать в ПДК";
+
+        setLine();
+
+        // add only checked data
+        // check it with data
 
         barChartData.datasets.forEach(function (dataset) {
 
             let name = dataset.label
 
             //dataset.data = dataset.data.map(function (value) {
+
 
             for (indicator in indicatorsValues) {
 
@@ -329,7 +513,9 @@ function recalcPDK() {
             //});
         });
     }
+
     myBar.update();
+
 }
 
 function pushElementsValues(ObjectForFill, index) {
@@ -349,54 +535,144 @@ function pushElementsValues(ObjectForFill, index) {
     return elements
 }
 
-function toggleChart() {
-    // toggle type of chart
-    myBar.destroy();
-    //change chart type: 
-    chartType = (myBar.config.type == 'bar') ? 'line' : 'bar';
-    //restart chart:
-    myBar = new Chart(targetCanvas, {
-        type: chartType,
-        data: barChartData,
-        options: {
-            responsive: true,
-            legend: {
-                position: 'top',
-                onClick: (e) => e.stopPropagation()
-            },
-            title: {
-                display: true,
-                text: charTitle
-            }
-        }
-    });
-}
-
 function toggleTable() {
     //console.log(dataForChartRaw[1])
-    if (document.getElementById("toggleTable").innerHTML == "Данные по расходам"){
+    if (this.id == "showFlowRate") {
         myBar.destroy();
-        document.getElementById("modal-listDates").innerHTML = "";
-        document.getElementById("modal-listIndicator").innerHTML = "";
         indicatorsValues = pushElementsValues(dataForChartRaw[1], 2);
         dateValues = dataForChartRaw[1].map(function (e) { return parseInt(Object.keys(e)[0]) });
         charTitle = "Данные по расходам"; // get name from first object
         color = Chart.helpers.color;
         colorNames = Object.keys(window.chartColors);
         firstElement = "rashod";
-        $("#recalcPDK").html("Пересчитать в ПДК");
-        $("#toggleTable").html("Данные по элементам");
-        $("#recalcPDK").prop("disabled", true);
+        barChartData = {
+            labels: dateValues.map(function (e) { return formateDate(e) }),
+            datasets: [{
+                label: indicatorsValues[firstElement]['alias'],
+                backgroundColor: indicatorsValues[firstElement]['color'],
+                data: indicatorsValues[firstElement]['values']
+            }]
+
+        };
+        $('#lstIndicators').multiselect('disable', true);
+        //$("#lstDates").multiselect('reset');
+        $("#lstDates").empty();
+        createCheckboxesDates(dateValues);
+        $("#lstDates").multiselect('reload');
         init();
+        $("#formIndicator").hide();
+        $("#recalcPDK").prop("disabled", true);
+
 
     }
-    else{
-        $("#toggleTable").html("Данные по расходам");
+    else {
         myBar.destroy();
-        document.getElementById("modal-listDates").innerHTML = "";
-        document.getElementById("modal-listIndicator").innerHTML = "";
+        $("#recalcPDK").prop("disabled", true);
+        $('#lstIndicators').multiselect('disable', false);
+        $("#lstDates").empty();
         $("#recalcPDK").prop("disabled", false);
-        loadModal(dataForChartRaw);
+        dateValues = dataForChartRaw[0].map(function (e) { return parseInt(Object.keys(e)[0]) });
+        $("#macroElements").empty();
+        $("#microElements").empty();
+        createCheckboxesDates(dateValues);
+        $("#lstDates").multiselect('reload');
+        loadModal(dataForChartRaw, currentLyrID);
+        $("#formIndicator").show();
+
+        // set selected indicators to first element
+        $("#lstIndicators option:selected").each(function (key, value) {
+            if (value.value == firstElement) {
+                $(value).prop("selected", true)
+            }
+            else {
+                $(value).removeAttr("selected")
+            }
+        })
+        $("#lstIndicators").multiselect('reload');
+        $("#lstIndicators").trigger("onSelectAll")
+    }
+}
+
+function range(start, edge, step) {
+    // If only one number was passed in make it the edge and 0 the start.
+    if (arguments.length == 1) {
+        edge = start;
+        start = 0;
     }
 
+    // Validate the edge and step numbers.
+    edge = edge || 0;
+    step = step || 1;
+
+    // Create the array of numbers, stopping befor the edge.
+    for (var ret = []; (edge - start) * step > 0; start += step) {
+        ret.push(start);
+    }
+    return ret;
+}
+
+function limitNumber() {
+    //return index of list which limit will be used
+    // need to use different pdk value for different layers
+    let indexOfList = (currentLyrID == 6 ||
+        currentLyrID == 7) ? 0 : 1
+    return indexOfList;
+}
+
+function setLine() {
+    if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть значения") {
+
+        // disable button recalc pdk for pH
+        // if (myBar.chart.config.data.datasets[0].label == "pH") {
+        //     $("#recalcPDK").prop("disabled", true);
+        // }
+
+        let currentIndicatorAlias = myBar.chart.config.data.datasets[0].label
+        let elements = returnBlankTemplate();
+        let pdkValue;
+        $.each(elements, function (key, value) {
+            if (elements[key]['alias'] == currentIndicatorAlias) {
+                pdkValue = elements[key]['limit'][limitNumber()];
+            };
+        });
+
+        // if PDK is not defined 
+        if (pdkValue == 0) {
+            // disable button recalc pdk
+            $("#recalcPDK").prop("disabled", true);
+            pdkValue = NaN;
+        }
+
+
+        if (pdkValue > Math.max.apply(null, myBar.chart.data.datasets[0].data)) {
+            //myBar.chart.scales['y-axis-0'].max = pdkValue + 0.2*pdkValue;
+            //myBar.chart.scales['y-axis-0'].ticks.max = pdkValue + 0.2 * pdkValue;
+            //myBar.update();
+        }
+
+        //myBar.chart.annotation.options.annotations[0].value = pdkValue;
+        myBar.chart.annotation.options.annotations[0] = {
+            drawTime: 'afterDatasetsDraw',
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-0',
+            value: pdkValue,
+            borderWidth: 5,
+            borderColor: 'red',
+            label: {
+                backgroundColor: "red",
+                content: "Значение ПДК (" + pdkValue + ")",
+                enabled: true,
+                position: "center",
+                // for showing label in chart
+                yAdjust: Math.max.apply(null, myBar.chart.data.datasets[0].data) - pdkValue > 0 ? -10 : 10,
+            }
+        }
+    }
+    else {
+        myBar.chart.annotation.options.annotations.pop();
+        // enable button recalcPDK when more than one element 
+        // enable button one element but not is pH
+        $("#recalcPDK").prop("disabled", false);
+    }
 }
