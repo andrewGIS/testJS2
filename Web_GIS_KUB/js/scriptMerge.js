@@ -222,6 +222,7 @@ require([
 			if (dom.byId('layerListDom').style.display == 'none') {
 
 				/*baron('.wrapper');*/
+				$(".content").mCustomScrollbar();
 
 				$(this).toggleClass("activeButton");
 				$("#layerListDom").show();
