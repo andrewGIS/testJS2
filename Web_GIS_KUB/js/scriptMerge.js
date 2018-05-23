@@ -4,7 +4,7 @@ require([
 	"esri/graphic",
 	"esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleFillSymbol", "esri/symbols/SimpleLineSymbol",
 	"esri/tasks/query", "esri/tasks/QueryTask", "esri/tasks/RelationshipQuery", "esri/tasks/GeometryService",
-	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar",
+	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar", "esri/dijit/ElevationProfile",
 
 	"esri/tasks/Geoprocessor",
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
@@ -28,6 +28,7 @@ require([
 	SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
 	Query, QueryTask, RelationshipQuery, GeometryService,
 	Measurement, Units, LayerList, Legend, Popup, PopupTemplate, HomeButton, OverviewMap, Scalebar,
+	ElevationProfile,
 
 	Geoprocessor,
 	ClassBreaksDefinition, AlgorithmicColorRamp,
@@ -351,6 +352,41 @@ require([
 				cursorOut();
 			}
 		});
+
+		// Панель профиля
+		on(dom.byId("ProfileBut"), "click", function () {
+			//$("#searchPanel").toggleClass("activeTab");
+			if (dom.byId('profilePanel').style.display == 'none') {
+				map.graphics.clear();
+				dom.byId('profilePanel').style.display = 'block';
+				$("#rightPanel, #dMeasurePane, #caseTitlePaneBM").hide();
+				$("#rightPanel").html("");
+				$("#featureCount").html('Кликните по объекту для идентификации');
+				$('#clearSelBut').hide();
+				$('#previous').hide();
+				$('#next').hide();
+				document.getElementById('map').style.right = '290px';
+				mMeasure.setTool("area", false);
+				mMeasure.setTool("distance", false);
+				mMeasure.setTool("location", false);
+				mMeasure.clearResult();
+				profileMaker.copyVars(map, new Graphic());
+				profileMaker.builtOptions();
+			} else {
+				dom.byId('profilePanel').style.display = 'none';
+				//dom.byId('rightPanel').style.display = 'block';
+				document.getElementById('map').style.right = '40px';
+				document.getElementById('rightPane').innerHTML = '';
+				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+				map.graphics.clear();
+				$('#clearSelBut').hide();
+				$('#previous').hide();
+				$('#next').hide();
+				finder.clearFinder();
+				cursorOut();
+			}
+		});
+		
 
 		// Функции для изменения указателя мыши
 		function cursorOver() { map.setMapCursor("help"); };
