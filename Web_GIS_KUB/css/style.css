@@ -41,9 +41,13 @@ html, body {
     position: relative;
     top: 0px;
     left: 0px;
-	  z-index: 50;
+	z-index: 50;
 	height: 40px;
 	width: 40px;
+	-webkit-border-radius:0px;
+	-moz-border-radius:0px;
+	-o-border-radius:0px;
+	border-radius:0px;
 }
 #HomeButton .home:hover {
   background-color: #000000;

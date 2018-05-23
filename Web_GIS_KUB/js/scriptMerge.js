@@ -284,7 +284,11 @@ require([
 		// Инфопанель справа
 		on(dom.byId("InfoBut"), "click", function () {
 			if (dom.byId('rightPanel').style.display == 'none') {
-				dom.byId('rightPanel').style.display = 'block';
+				$('#rightPane').html("");
+				//dom.byId('rightPanel').style.display = 'block';
+				$('#rightPanel').show();
+				$('#clearSelBut, #previous, #next').hide();
+				$('#featureCount').html('Кликните по объекту для идентификации');
 				$("#searchPanel, #dMeasurePane, #caseTitlePaneBM").hide();
 				document.getElementById('map').style.right = '290px';
 				mMeasure.setTool("area", false);
@@ -294,15 +298,12 @@ require([
 				mapClick = map.on("click", doIdentify);
 				cursorOver();
 			} else {
+				$('#rightPanel').hide();
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+				$('#rightPane').html('');
 				mapClick.remove();
 				map.graphics.clear();
-				document.getElementById('clearSelBut').style.display = 'none';
-				document.getElementById('previous').style.display = 'none';
-				document.getElementById('next').style.display = 'none';
 				cursorOut();
 			}
 		});
@@ -324,7 +325,6 @@ require([
 				map.graphics.clear();
 				dom.byId('searchPanel').style.display = 'block';
 				$("#rightPanel, #dMeasurePane, #caseTitlePaneBM").hide();
-				$("#rightPanel").html("");
 				$("#featureCount").html('Кликните по объекту для идентификации');
 				$('#clearSelBut').hide();
 				$('#previous').hide();
@@ -340,7 +340,7 @@ require([
 				dom.byId('searchPanel').style.display = 'none';
 				//dom.byId('rightPanel').style.display = 'block';
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
+				document.getElementById('rightPanel').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				map.graphics.clear();
 				$('#clearSelBut').hide();
