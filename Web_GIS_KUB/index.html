@@ -15,6 +15,7 @@
 	<link rel="stylesheet" href="css/modal.css">
 	<link rel="stylesheet" href="css/find.css">
 	<link rel="stylesheet" href="css/jquery.multiselect.css">
+	<link rel="stylesheet" href="css/profile_maker.css">
 	<!--<link rel="stylesheet" href="css/jquery.mCustomScrollbar.css">-->
 	<!--<link rel="stylesheet" href="css/baron.css">-->
 	<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>-->
@@ -87,91 +88,91 @@
 				</li>
 				<li>
 					<button id="ProfileBut" title="Построение профиля" class="mainButton">
-						<img src="images/binoculars.png" style="width: 25px; height: 20px;">
+						<img src="images/graphic.jpg" style="width: 25px; height: 21px;">
 					</button>
 				</li>
 			</ul>
 		</div>
 		<!--<div id="layerListDom"></div>-->
 		<!--<div class="wrapper" style = "overflow-y: scroll; box-sizing: border-box; margin: 0px; border: 0px;">-->
-			<div class="content">
-				<div class="mCustomScrollbar" data-mcs-theme="dark">
-					<div id="layerListDom"></div>
-				</div>
-				<!--<div class="scroller__bar"></div>-->
+		<div class="content">
+			<div class="mCustomScrollbar" data-mcs-theme="dark">
+				<div id="layerListDom"></div>
 			</div>
+			<!--<div class="scroller__bar"></div>-->
+		</div>
 		<!--</div>-->
 
 
-	</div>
-	<div id="caseTitlePaneBM">
-		<div id="TitlePaneBM">
-			<table>
-				<tr>
-					<td>
-						<input type='checkbox' id="BaseMapTP" autocomplete="off">
-					</td>
-					<td>
-						<label for="BaseMapTP">Базовая карта</label>
-					</td>
-				</tr>
-			</table>
-			<hr color="#dfdfe2" size="1px">
-			<table>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="OSMTP" class='backingMap' value=1 autocomplete="off" checked/>
-					</td>
-					<td>
-						<label for="OSMTP">OpenStreetMap</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="RosReestrTP" class='backingMap' value=2 autocomplete="off" />
-					</td>
-					<td>
-						<label for="RosReestrTP">Карта Росреестра</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="ArcGISSI" class='backingMap' value=3 autocomplete="off" />
-					</td>
-					<td>
-						<label for="ArcGISSI">ArcGIS.Imagery</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="ArcGISWM" class='backingMap' value=3 autocomplete="off" />
-					</td>
-					<td>
-						<label for="ArcGISWM">ArcGIS.World Topo Map</label>
-					</td>
-				</tr>
-			</table>
+
+		<div id="caseTitlePaneBM">
+			<div id="TitlePaneBM">
+				<table>
+					<tr>
+						<td>
+							<input type='checkbox' id="BaseMapTP" autocomplete="off">
+						</td>
+						<td>
+							<label for="BaseMapTP">Базовая карта</label>
+						</td>
+					</tr>
+				</table>
+				<hr color="#dfdfe2" size="1px">
+				<table>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="OSMTP" class='backingMap' value=1 autocomplete="off" checked/>
+						</td>
+						<td>
+							<label for="OSMTP">OpenStreetMap</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="RosReestrTP" class='backingMap' value=2 autocomplete="off" />
+						</td>
+						<td>
+							<label for="RosReestrTP">Карта Росреестра</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="ArcGISSI" class='backingMap' value=3 autocomplete="off" />
+						</td>
+						<td>
+							<label for="ArcGISSI">ArcGIS.Imagery</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="ArcGISWM" class='backingMap' value=3 autocomplete="off" />
+						</td>
+						<td>
+							<label for="ArcGISWM">ArcGIS.World Topo Map</label>
+						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
-	</div>
-	<div id="dMeasurePane" style="display:none">
-		<div id="MIst"></div>
-	</div>
-	<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
-		<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
-		<div id="pager">
-			<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;">
-				<img src="images/arrow_previous.png" style="width: 20px; height: 20px;">
-			</button>
-			<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;">
-				<img src="images/arrow_next.png" style="width: 20px; height: 20px;">
-			</button>
-			<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;">
-				<img src="images/clear_select.png" style="width: 20px; height: 20px;">
-			</button>
+		<div id="dMeasurePane" style="display:none">
+			<div id="MIst"></div>
 		</div>
-		<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
-		<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"></div>
-		<!--<div id="headerIP">
+		<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
+			<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
+			<div id="pager">
+				<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;">
+					<img src="images/arrow_previous.png" style="width: 20px; height: 20px;">
+				</button>
+				<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;">
+					<img src="images/arrow_next.png" style="width: 20px; height: 20px;">
+				</button>
+				<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;">
+					<img src="images/clear_select.png" style="width: 20px; height: 20px;">
+				</button>
+			</div>
+			<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
+			<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"></div>
+			<!--<div id="headerIP">
 				<span id="headerIPText">Кликните по объекту для идентификации</span>
 				<button id="closeIP" style="display: none;">Очистить</button>
 			</div>
@@ -180,19 +181,60 @@
 			<div id="rightPanelContent">			
 				<div id="attTable" data-dojo-type="dijit/layout/ContentPane">
 			</div> -->
-	</div>
-	<div id="searchPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
-		<div id="searchCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
-		<div id="searchResults"></div>
-	</div>
-	<div id="footer1">
-		<div id="scale">| М 1:5'000'000</div>
-		<div id="coord">58.907°N, 45.106°E</div>
-	</div>
-	<div id="map">
-	</div>
-	</div>
+		</div>
+		<div id="searchPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
+			<div id="searchCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
+			<div id="searchResults"></div>
+		</div>
 
+		<div id="map">
+
+		</div>
+		<div id="profileContainer" style="display:none;">
+			<div id="profile_options">
+				<div id = "profile_options_header">
+				<h1>
+					<a>Опции профиля</a>
+				</h1>
+			</div>
+				<form id="form_11760">
+					<div id = "options_container">
+						<li id="river_choice">
+							<label class="description" for="element_1">Выбор реки </label>
+							<span>
+								<input id="element_1_1" name="riverChoice" class="element checkbox" type="radio" value="1" autocomplete="off">
+								<label class="choice" for="element_1_1">Косьва</label>
+								<input id="element_1_2" name="riverChoice" class="element checkbox" type="radio" value="2" autocomplete="off">
+								<label class="choice" for="element_1_2">Чусовая</label>
+								<input id="element_1_3" name="riverChoice" class="element checkbox" type="radio" value="3" autocomplete="off">
+								<label class="choice" for="element_1_3" >Яйва</label>
+
+							</span>
+						</li>
+						<li id="surface_choice">
+							<label class="description" for="element_2">Показатель </label>
+							<div>
+								<select class="element select medium" id="element_2" name="element_2">
+									<option value="" selected="selected"></option>
+									<option value="1">Профиль рельфеа</option>
+									<option value="2">Расход</option>
+									<option value="3">Элемент 1</option>
+									<option value="4">Элемент 2</option>
+
+								</select>
+							</div>
+						</li>
+					</div>
+				</form>
+			</div>
+			<div id = "profile_graph"></div>
+		</div>
+
+		<div id="footer1">
+			<div id="scale">| М 1:5'000'000</div>
+			<div id="coord">58.907°N, 45.106°E</div>
+		</div>
+	</div>
 
 	<!-- modal window code -->
 

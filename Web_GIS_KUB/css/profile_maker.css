@@ -1,0 +1,46 @@
+#profileContainer{
+  height:25%;
+  width: calc(100% - 46px);
+  bottom: 20px;
+  position: absolute;
+  z-index: 1000;
+  border-radius: 2px;
+  border-color: black;
+  border-style:solid;
+  right: 40px;
+  display: inline-flex;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+#profile_options{
+  position:relative;
+  width:15%;
+  margin:10px;
+  border-style: solid;
+}
+#profile_graph{
+  position:relative;
+  width:85%;
+  border-style: solid;
+  margin:10px;
+}
+#options_container{
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+}
+#river_choice{
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size:12px;
+}
+#surface_choice{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size:12px;
+}
+#profile_options_header{
+  text-align: center;
+}

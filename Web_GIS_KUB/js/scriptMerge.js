@@ -356,34 +356,29 @@ require([
 		// Панель профиля
 		on(dom.byId("ProfileBut"), "click", function () {
 			//$("#searchPanel").toggleClass("activeTab");
-			if (dom.byId('profilePanel').style.display == 'none') {
+			if (dom.byId('profileContainer').style.display == 'none') {
+				profileMaker.initProfileMaker();
 				map.graphics.clear();
-				dom.byId('profilePanel').style.display = 'block';
-				$("#rightPanel, #dMeasurePane, #caseTitlePaneBM").hide();
-				$("#rightPanel").html("");
-				$("#featureCount").html('Кликните по объекту для идентификации');
-				$('#clearSelBut').hide();
-				$('#previous').hide();
-				$('#next').hide();
-				document.getElementById('map').style.right = '290px';
+				$("#rightPanel, #searchPanel, #caseTitlePaneBM").hide();
+				// $("#rightPanel").html("");
+				// $("#featureCount").html('Кликните по объекту для идентификации');
+				// $('#clearSelBut').hide();
+				// $('#previous').hide();
+				// $('#next').hide();
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
 				mMeasure.clearResult();
-				profileMaker.copyVars(map, new Graphic());
-				profileMaker.builtOptions();
 			} else {
-				dom.byId('profilePanel').style.display = 'none';
-				//dom.byId('rightPanel').style.display = 'block';
-				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
-				map.graphics.clear();
-				$('#clearSelBut').hide();
-				$('#previous').hide();
-				$('#next').hide();
-				finder.clearFinder();
-				cursorOut();
+				//dom.byId('profileContainer').style.display = 'none';
+				// document.getElementById('rightPane').innerHTML = '';
+				// document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+				// map.graphics.clear();
+				// $('#clearSelBut').hide();
+				// $('#previous').hide();
+				// $('#next').hide();
+				// cursorOut();
+				profileMaker.resetProfileMaker();
 			}
 		});
 		

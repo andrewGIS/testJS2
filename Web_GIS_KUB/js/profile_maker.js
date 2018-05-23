@@ -6,18 +6,23 @@ var profileMaker = function (){
     }
 
     // make html elements
-    function builtOptons(){
+    function initProfileMaker(){
+
+        $("#map").css("bottom","calc(20px + 25% + 2px)");
+        $("#profileContainer").show();
+        $("#profileContainer").append("<div id = 'options'></div>")
         
     }
 
     // clear dom element of Profile
     function resetProfileMaker() {
-        
+        $("#profileContainer").hide();
+        $("#map").css("bottom","20px");
     }
 
     return {
-        builtOptons: builtOptons,
+        initProfileMaker: initProfileMaker,
         copyVars: copyVars,
         resetProfileMaker: resetProfileMaker
     }
-}
+}()
