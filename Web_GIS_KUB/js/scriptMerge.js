@@ -4,13 +4,17 @@ require([
 	"esri/graphic",
 	"esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleFillSymbol", "esri/symbols/SimpleLineSymbol",
 	"esri/tasks/query", "esri/tasks/QueryTask", "esri/tasks/RelationshipQuery", "esri/tasks/GeometryService",
-	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar", "esri/dijit/ElevationProfile",
+	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar",
+	"esri/layers/GraphicsLayer",
+	
+	
 
 	"esri/tasks/Geoprocessor",
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
 	"esri/tasks/GenerateRendererParameters", "esri/tasks/GenerateRendererTask",
 	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
 	"esri/tasks/FindTask", "esri/tasks/FindParameters",
+	"esri/tasks/FeatureSet",
 
 	"esri/TimeExtent", "esri/dijit/TimeSlider",
 	"dojo/_base/array",
@@ -28,13 +32,14 @@ require([
 	SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
 	Query, QueryTask, RelationshipQuery, GeometryService,
 	Measurement, Units, LayerList, Legend, Popup, PopupTemplate, HomeButton, OverviewMap, Scalebar,
-	ElevationProfile,
+	GraphicsLayer,
 
 	Geoprocessor,
 	ClassBreaksDefinition, AlgorithmicColorRamp,
 	GenerateRendererParameters, GenerateRendererTask,
 	IdentifyTask, IdentifyParameters,
 	FindTask, FindParameters,
+	FeatureSet,
 
 	TimeExtent, TimeSlider,
 	arrayUtils,
@@ -223,7 +228,7 @@ require([
 			if (dom.byId('layerListDom').style.display == 'none') {
 
 				/*baron('.wrapper');*/
-				$(".content").mCustomScrollbar();
+				//$(".content").mCustomScrollbar();
 
 				$(this).toggleClass("activeButton");
 				$("#layerListDom").show();
@@ -357,9 +362,14 @@ require([
 		on(dom.byId("ProfileBut"), "click", function () {
 			//$("#searchPanel").toggleClass("activeTab");
 			if (dom.byId('profileContainer').style.display == 'none') {
+				profileMaker.copyVars(map);
 				profileMaker.initProfileMaker();
 				map.graphics.clear();
 				$("#rightPanel, #searchPanel, #caseTitlePaneBM").hide();
+
+				//epWidget = new ElevationProfile(profileParams, dom.byId("profile_graph"));
+				//epWidget.startup();
+
 				// $("#rightPanel").html("");
 				// $("#featureCount").html('Кликните по объекту для идентификации');
 				// $('#clearSelBut').hide();

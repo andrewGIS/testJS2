@@ -319,10 +319,11 @@ function createCheckboxesIndicator(arr) {
     $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
         let element = value.firstChild.defaultValue;
         if (elements[element]['limit'][limitNumber()]){
-            $(value).css("background-color","#c8ff49")
+            //$(value).css("background-color","#c8ff49")
+            $(value).css("background-color","#ff0000")
         }
         else {
-            $(value).css("background-color",'#f27e2b')
+            //$(value).css("background-color",'#f27e2b')
         }
     });
 

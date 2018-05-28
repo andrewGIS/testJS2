@@ -38,6 +38,8 @@
 	<script type="text/javascript" src="js/jquery.multiselect.js"></script>
 	<script type="text/javascript" src="js/script_search.js"></script>
 	<script type="text/javascript" src="js/profile_maker.js"></script>
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+	<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 	<!--<script type="text/javascript" src="js/jquery.mCustomScrollbar.concat.min.js"></script>-->
 	<!--<script type="text/javascript" src="js/baron.js"></script>-->
 	<!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
@@ -192,13 +194,13 @@
 		</div>
 		<div id="profileContainer" style="display:none;">
 			<div id="profile_options">
-				<div id = "profile_options_header">
-				<h1>
-					<a>Опции профиля</a>
-				</h1>
-			</div>
+				<div id="profile_options_header">
+					<h1>
+						<a>Опции профиля</a>
+					</h1>
+				</div>
 				<form id="form_11760">
-					<div id = "options_container">
+					<div id="options_container">
 						<li id="river_choice">
 							<label class="description" for="element_1">Выбор реки </label>
 							<span>
@@ -207,7 +209,7 @@
 								<input id="element_1_2" name="riverChoice" class="element checkbox" type="radio" value="2" autocomplete="off">
 								<label class="choice" for="element_1_2">Чусовая</label>
 								<input id="element_1_3" name="riverChoice" class="element checkbox" type="radio" value="3" autocomplete="off">
-								<label class="choice" for="element_1_3" >Яйва</label>
+								<label class="choice" for="element_1_3">Яйва</label>
 
 							</span>
 						</li>
@@ -215,8 +217,7 @@
 							<label class="description" for="element_2">Показатель </label>
 							<div>
 								<select class="element select medium" id="element_2" name="element_2">
-									<option value="" selected="selected"></option>
-									<option value="1">Профиль рельфеа</option>
+									<option value="1" selected="selected">Профиль рельефа</option>
 									<option value="2">Расход</option>
 									<option value="3">Элемент 1</option>
 									<option value="4">Элемент 2</option>
@@ -227,7 +228,7 @@
 					</div>
 				</form>
 			</div>
-			<div id = "profile_graph"></div>
+			<div id="profile_graph"></div>
 		</div>
 
 		<div id="footer1">

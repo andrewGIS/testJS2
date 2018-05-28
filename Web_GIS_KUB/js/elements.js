@@ -5,7 +5,7 @@ function returnBlankTemplate() {
             "color": "#4dc9f6",
             "alias": "CI",
             "values": [],
-            "limit": [0, 0],
+            "limit": [350, 300],
             "class": "macro"
         },
         "co": {

@@ -44,3 +44,12 @@
 #profile_options_header{
   text-align: center;
 }
+/* .esriElevationProfileChartNode{
+  height:85% !important;
+  min-height: 50px !important;
+} */
+#profile_canvas{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
