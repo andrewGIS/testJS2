@@ -93,7 +93,7 @@ function returnBlankTemplate() {
             "class": "micro"
         },
         "mg": {
-            "color": "#2dc7ff",
+            "color": "#hdc7ff",
             "alias": "Mg",
             "values": [],
             "limit": [50, 40],

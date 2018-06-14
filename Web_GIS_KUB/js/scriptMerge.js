@@ -533,7 +533,7 @@ require([
 				currentObject.layerId === 7 ||
 				currentObject.layerId === 8 ||
 				currentObject.layerId === 9) {
-				currentContent += "<tr><td><button id = 'addInfo' class = 'modalButton' style = 'font-size: 13px;padding:0'> Доп.информация </button></td></tr>"
+				currentContent += "<tr><td><button id = 'addInfo' class = 'modalButton' style = 'font-size: 13px;padding:0'> Дополнительная информация </button></td></tr>"
 			}
 
 			if (currentObject.layerId === 23 ||

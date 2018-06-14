@@ -115,7 +115,7 @@ function init() {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: firstElement == "rashod"?'Расход, м³/сек':'Значение показателя, мг/дм³',
+                        labelString: firstElement == "rashod"?'Расход, м³/сек':'мг/дм³',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",
@@ -135,11 +135,11 @@ function init() {
                 xAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Даты обследований',
+                        //labelString: 'Даты обследований',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",
-                        padding: 4,
+                        padding: 4
                     }
                 }]
 
@@ -230,7 +230,7 @@ function addDate(dateValue, position) {
 
                     var indicatorValue = selectedDataObj[dateValue][indicator]
 
-                    if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
+                    if (document.getElementById("recalcPDK").innerHTML == "Вернуть абсолютные значения") {
 
                         var pdkValue = indicatorValue / indicatorsValues[indicator]['limit'][limitNumber()]
 
@@ -410,7 +410,7 @@ function addIndicator(indicatorName) {
 
     // check how to add data in pdk or not
 
-    if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
+    if (document.getElementById("recalcPDK").innerHTML == "Вернуть абсолютные значения") {
 
         // dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
         dataToAdd = arrValues.map(function (value) {
@@ -461,7 +461,7 @@ function recalcPDK() {
 
         myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Единиц ПДК"
 
-        document.getElementById("recalcPDK").innerHTML = "Вернуть значения";
+        document.getElementById("recalcPDK").innerHTML = "Вернуть абсолютные значения";
 
         barChartData.datasets.forEach(function (dataset) {
 
@@ -621,7 +621,7 @@ function limitNumber() {
 }
 
 function setLine() {
-    if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть значения") {
+    if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть абсолютные значения") {
 
         // disable button recalc pdk for pH
         // if (myBar.chart.config.data.datasets[0].label == "pH") {

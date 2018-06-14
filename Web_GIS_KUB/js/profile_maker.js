@@ -43,7 +43,8 @@ var profileMaker = function () {
             queryTask = new QueryTask("http://maps.psu.ru:8080/arcgis/rest/services/KUB/river_for_profile/MapServer/0");
             //riverRenderer = new SimpleRenderer(lineStyle);
             //pointRenderer = new SimpleRenderer(pointStyle);
-            gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2");
+            //gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2");
+            gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/prMaker/GPServer/profile_maker_5");
             grLayerRiver = new GraphicsLayer();
             grLayerPnt = new GraphicsLayer();
 
@@ -61,6 +62,9 @@ var profileMaker = function () {
         // setting render
         //grLayer.setRenderer(riverRenderer);
         //grLayerPnt.setRenderer(pointRenderer);
+
+        grLayerPnt.clear(); // clear point
+        grLayerRiver.clear();// clear river
 
         mapCopy.addLayer(grLayerRiver);
         mapCopy.addLayer(grLayerPnt);
@@ -86,11 +90,20 @@ var profileMaker = function () {
 
     function getInterpolatedLine(idRiver) {
 
-        var expression = "type = " + parseInt(idRiver)
+        var target_river = parseInt(idRiver);
+        var parameter_for_interpolate = 1;
+        var step = 1000;
+        var expression = "type = " + parseInt(idRiver);
 
         var paramsGp = {
-            "Expression": expression
+            "Expression": expression,
+            "step": 100,
         };
+        // var paramsGp = {
+        //      "target_river": target_river,
+        //      "parameter_for_interpolate": parameter_for_interpolate,
+        //      "step_profile_for_interpolate": step
+        // };
 
         gp.submitJob(paramsGp, successGp, errorGp);
         //gp.execute(paramsGp).then(successGp);
@@ -124,8 +137,10 @@ var profileMaker = function () {
 
         //console.log(job.jobId);
 
+        // change out parameter
         $.ajax({
-            url: "http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2/jobs/" + job.jobId + "/results/outLine?returnZ=true&returnM=false&f=json",
+            // url: "http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2/jobs/" + job.jobId + "/results/outLine?returnZ=true&returnM=true&f=json",
+            url: "http://maps.psu.ru:8080/arcgis/rest/services/KUB/prMaker/GPServer/profile_maker_5/jobs/" + job.jobId + "/results/outLine_hillshade?returnZ=true&returnM=false&f=json",
             dataType: 'json'
         }).done(function (data) {
             console.log(data);
@@ -133,7 +148,10 @@ var profileMaker = function () {
             var zArray = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
                 return coord[2]
             })
-            builtProfile(zArray);
+            var labelsArr = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
+                return index * 10/1000 + "км."
+            })
+            builtProfile(zArray, labelsArr);
             //     //drawRiver(data.value.features[0]);
             //     // passing to neccessaary features
             //     // data.value.features[0].geometry.paths
@@ -143,29 +161,35 @@ var profileMaker = function () {
     }
 
     // make profile
-    function builtProfile(dataArr) {
+    function builtProfile(dataArr, labelsArr) {
 
 
         var pointGeometry; // for point geometry
         var pointStyle;// style for selected point on profile
         var pointGraphic;// style for selected point on profile
 
+
+
         require([
             "esri/geometry/Point",
             "esri/symbols/SimpleMarkerSymbol",
             "esri/symbols/SimpleLineSymbol",
+            "esri/Color",
             "esri/graphic"
-        ], function (Point, SimpleMarkerSymbol, SimpleLineSymbol, Graphic) {
+        ], function (Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, Graphic) {
             pointGeometry = new Point();
             pointGeometry.spatialReference = mapCopy.spatialReference;
 
             pointStyle = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
                 new Color([0, 0, 0]), 1.5), new Color([248, 0, 0, 0.8]));
-            pointGraphic =  new Graphic ();
+            pointGraphic = new Graphic();
         })
 
 
         profile_chart = new Highcharts.chart('profile_graph', {
+            xAxis: {
+                categories: labelsArr
+            },
             plotOptions: {
                 series: {
                     point: {
@@ -217,16 +241,16 @@ var profileMaker = function () {
 
         require([
             "esri/symbols/SimpleLineSymbol",
-            "esri/graphic"
-        ], function (SimpleLineSymbol, Graphic) {
+            "esri/graphic",
+            "esri/Color"
+        ], function (SimpleLineSymbol, Graphic, Color) {
             lineStyle = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([102, 0, 0, 1]), 2);
-            lineGraphic = new Graphic ();
+            lineGraphic = new Graphic();
         })
 
         lineGraphic.setGeometry(feature.geometry);
         lineGraphic.setSymbol(lineStyle);
         //mapCopy.graphics.add(graphicCopy);
-        grLayerRiver.clear();
         grLayerRiver.add(lineGraphic);
 
     }
