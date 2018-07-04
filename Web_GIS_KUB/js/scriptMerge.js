@@ -361,6 +361,7 @@ require([
 		// Панель профиля
 		on(dom.byId("ProfileBut"), "click", function () {
 			//$("#searchPanel").toggleClass("activeTab");
+			$(this).toggleClass("activeButton");
 			if (dom.byId('profileContainer').style.display == 'none') {
 				profileMaker.copyVars(map);
 				profileMaker.initProfileMaker();

@@ -3,11 +3,14 @@ var profileMaker = function () {
     var gp; // geoproccesoor task
     var queryTask; // query river geometry from server
     var query; // query river geometry from server
-    var profile_chart; // buit graph
+    var profile_chart; // built graph
     var mapCopy;// copy for map object
     var profileData;// store native data from profile
     var grLayerRiver; // graphic layer for selected river
     var grLayerPnt;// graphic layer for selected point
+    var step = 1000;; // step for profile
+    var NAparams; // parameters for routing
+    var closestFacilityTask; // routing
 
 
     // copy vars in module
@@ -17,11 +20,6 @@ var profileMaker = function () {
 
     // make html elements
     function initProfileMaker() {
-
-
-
-        var routeRenderer;
-        var pointRenderer;
 
 
         $("#map").css("bottom", "calc(20px + 25% + 2px)");
@@ -35,33 +33,72 @@ var profileMaker = function () {
             "esri/symbols/SimpleLineSymbol",
             "esri/renderers/SimpleRenderer",
             "esri/layers/GraphicsLayer",
-            "esri/tasks/Geoprocessor"
+            "esri/tasks/Geoprocessor",
+            "esri/Color",
+            "esri/graphic",
+            "esri/geometry/Point",
 
-        ], function (Query, QueryTask, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, GraphicsLayer, Geoprocessor) {
+        ], function (Query, QueryTask, SimpleMarkerSymbol, SimpleLineSymbol, SimpleRenderer, GraphicsLayer, Geoprocessor, Color, Graphic, Point) {
 
             query = new Query();
             queryTask = new QueryTask("http://maps.psu.ru:8080/arcgis/rest/services/KUB/river_for_profile/MapServer/0");
             //riverRenderer = new SimpleRenderer(lineStyle);
             //pointRenderer = new SimpleRenderer(pointStyle);
             //gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2");
-            gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/prMaker/GPServer/profile_maker_5");
+            gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/prMaker/GPServer/profile_maker_6");
             grLayerRiver = new GraphicsLayer();
             grLayerPnt = new GraphicsLayer();
 
+            pointGeometry = new Point();
+            pointGeometry.spatialReference = mapCopy.spatialReference;
+
+            pointStyle = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                new Color([0, 0, 0]), 1.5), new Color([248, 0, 0, 0.8]));
+            pointGraphic = new Graphic();
+
+            profile_chart = new Highcharts.chart('profile_graph', {
+                xAxis: {
+                    categories: []
+                },
+                plotOptions: {
+                    series: {
+                        point: {
+                            events: {
+                                mouseOver: function (e) {
+                                    //console.log(e);
+                                    //console.log(profileData[e.target.index]);
+                                    pointGeometry.x = profileData[e.target.index][0]
+                                    pointGeometry.y = profileData[e.target.index][1]
+                                    pointGraphic.setGeometry(pointGeometry);
+                                    pointGraphic.setSymbol(pointStyle);
+                                    //mapCopy.graphics.add(pointGraphic);
+                                    grLayerPnt.add(pointGraphic);
+                                }
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                chart: {
+                    zoomType: 'x'
+                },
+                series: [{
+                    name: "Значение показателя",
+                    data: [],
+                    dataGrouping: {
+                        enabled: false
+                    }
+                }],
+                title: {
+                    // Title of chart as Профиль реки и выбранная река
+                    text: "Профиль реки " + $("label[for='" + $("#river_choice :checked").attr('id') + "']").html()
+                }
+
+            })
+
         })
-
-        // new GraphicsLayer({"id":"river"}),
-        //new GraphicsLayer({"id":"pnts"})
-
-
-        // test to change prjection 
-        //grLayer.spatialReference = {wkid:102100}        
-        //grLayerPnt.spatialReference = {wkid:102100}       
-
-
-        // setting render
-        //grLayer.setRenderer(riverRenderer);
-        //grLayerPnt.setRenderer(pointRenderer);
 
         grLayerPnt.clear(); // clear point
         grLayerRiver.clear();// clear river
@@ -69,59 +106,60 @@ var profileMaker = function () {
         mapCopy.addLayer(grLayerRiver);
         mapCopy.addLayer(grLayerPnt);
 
+        //startGP();
 
-
+        $("#surface_choice").on("click", "option", function () {
+            startGP();
+        });
 
         $("#river_choice").on("click", "input", function () {
-            //console.log(this);
-            query.returnGeometry = true;
-            query.where = "type = " + parseInt(this.value)
-            queryTask.execute(query, function (results) {
-                //console.log(results);
-                drawRiver(results.features[0]);
-            })
-            getInterpolatedLine(this.value);
+            startGP();
         });
 
 
-
+        set_params_NA();
 
     }
 
-    function getInterpolatedLine(idRiver) {
+    function startGP() {
+        //console.log(this);
 
-        var target_river = parseInt(idRiver);
-        var parameter_for_interpolate = 1;
-        var step = 1000;
-        var expression = "type = " + parseInt(idRiver);
+        // $("#profile_graph").toggleClass("loader");
+        profile_chart.showLoading();
+
+        // reading current values selected river
+        let idRiver = parseInt($("#river_choice :checked").val());
+        let expression = "type = " + parseInt(idRiver);
+
+        // get river geometry from server
+        query.returnGeometry = true;
+        query.where = "type = " + idRiver
+        queryTask.execute(query, function (results) {
+            //console.log(results);
+            drawRiver(results.features[0]);
+        })
 
         var paramsGp = {
             "Expression": expression,
-            "step": 100,
+            "step": step,
         };
-        // var paramsGp = {
-        //      "target_river": target_river,
-        //      "parameter_for_interpolate": parameter_for_interpolate,
-        //      "step_profile_for_interpolate": step
-        // };
 
-        gp.submitJob(paramsGp, successGp, errorGp);
+        gp.submitJob(paramsGp, successGp, executeGp);
         //gp.execute(paramsGp).then(successGp);
-
-
-
-        //gp.execute(params, successGp , errorGp);
 
 
     }
 
     // handle gP error
-    function errorGp(e) {
-        console.log(e.jobStatus)
+    function executeGp(e) {
+        // profile_chart.hideLoading();
+        console.log(e.jobStatus);
     }
 
 
+    // success gP
     function successGp(job) {
+        // enable options
         //console.log(results);
         //var zArray = results[0].value.features[0].geometry.paths[0].map(function (coord, index, arr) {
         //return coord[2]
@@ -135,23 +173,25 @@ var profileMaker = function () {
 
         //"http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2/jobs/"+results.jobId+"/results/outLine?returnZ=true&returnM=false&f=json"
 
-        //console.log(job.jobId);
-
         // change out parameter
+        let nameParam = $("#surface_choice :checked").val()
+
         $.ajax({
             // url: "http://maps.psu.ru:8080/arcgis/rest/services/KUB/Profile/GPServer/profile_maker_2/jobs/" + job.jobId + "/results/outLine?returnZ=true&returnM=true&f=json",
-            url: "http://maps.psu.ru:8080/arcgis/rest/services/KUB/prMaker/GPServer/profile_maker_5/jobs/" + job.jobId + "/results/outLine_hillshade?returnZ=true&returnM=false&f=json",
+            url: "http://maps.psu.ru:8080/arcgis/rest/services/KUB/prMaker/GPServer/profile_maker_6/jobs/" + job.jobId + "/results/" + nameParam + "?returnZ=true&returnM=false&f=json",
             dataType: 'json'
         }).done(function (data) {
+
             console.log(data);
+
             profileData = data.value.features[0].geometry.paths[0];
-            var zArray = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
-                return coord[2]
+            let zArray = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
+                return +coord[2].toFixed(2)
             })
-            var labelsArr = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
-                return index * 10/1000 + "км."
+            let labelsArr = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
+                return index * step / 1000 + "км."
             })
-            builtProfile(zArray, labelsArr);
+            updateChartData(zArray, labelsArr);
             //     //drawRiver(data.value.features[0]);
             //     // passing to neccessaary features
             //     // data.value.features[0].geometry.paths
@@ -161,75 +201,26 @@ var profileMaker = function () {
     }
 
     // make profile
-    function builtProfile(dataArr, labelsArr) {
+    function updateChartData(dataArr, labelsArr) {
 
+        profile_chart.hideLoading();
 
-        var pointGeometry; // for point geometry
-        var pointStyle;// style for selected point on profile
-        var pointGraphic;// style for selected point on profile
+        profile_chart.setTitle({ text: "Профиль реки " + $("label[for='" + $("#river_choice :checked").attr('id') + "']").html() });
+        profile_chart.series[0].setData(dataArr);
+        profile_chart.xAxis[0].setCategories(labelsArr);
 
-
-
-        require([
-            "esri/geometry/Point",
-            "esri/symbols/SimpleMarkerSymbol",
-            "esri/symbols/SimpleLineSymbol",
-            "esri/Color",
-            "esri/graphic"
-        ], function (Point, SimpleMarkerSymbol, SimpleLineSymbol, Color, Graphic) {
-            pointGeometry = new Point();
-            pointGeometry.spatialReference = mapCopy.spatialReference;
-
-            pointStyle = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                new Color([0, 0, 0]), 1.5), new Color([248, 0, 0, 0.8]));
-            pointGraphic = new Graphic();
-        })
-
-
-        profile_chart = new Highcharts.chart('profile_graph', {
-            xAxis: {
-                categories: labelsArr
-            },
-            plotOptions: {
-                series: {
-                    point: {
-                        events: {
-                            mouseOver: function (e) {
-                                //console.log(e);
-                                //console.log(profileData[e.target.index]);
-                                pointGeometry.x = profileData[e.target.index][0]
-                                pointGeometry.y = profileData[e.target.index][1]
-                                pointGraphic.setGeometry(pointGeometry);
-                                pointGraphic.setSymbol(pointStyle);
-                                //mapCopy.graphics.add(pointGraphic);
-                                grLayerPnt.add(pointGraphic);
-                            }
-                        }
-                    }
-                }
-            },
-            legend: {
-                enabled: false
-            },
-            chart: {
-                zoomType: 'x'
-            },
-            series: [{
-                data: dataArr,
-                dataGrouping: {
-                    enabled: false
-                }
-            }]
-        })
 
     }
 
-    // clear dom element of Profile
+    // clear element of Profile
     function resetProfileMaker() {
         $("#profileContainer").hide();
         $("#map").css("bottom", "20px");
         $("#river_choice").off();
+        $("#surface_choice").off();
         profile_chart.destroy();
+        grLayerPnt.clear(); // clear point
+        grLayerRiver.clear();// clear river
     }
 
     // draw selected river on map
@@ -238,6 +229,8 @@ var profileMaker = function () {
         var lineStyle; // style for selected line
         var lineGraphic; // style for selected line
 
+        grLayerPnt.clear();
+        grLayerRiver.clear();
 
         require([
             "esri/symbols/SimpleLineSymbol",
@@ -253,6 +246,45 @@ var profileMaker = function () {
         //mapCopy.graphics.add(graphicCopy);
         grLayerRiver.add(lineGraphic);
 
+    }
+
+    //init NA server paramaters
+    function set_params_NA() {
+        require([
+            "esri/tasks/ClosestFacilityTask",
+            "esri/tasks/ClosestFacilityParameters",
+            "esri/tasks/FeatureSet",
+            "esri/graphic",
+            "esri/geometry/Point",
+            "esri/symbols/SimpleLineSymbol",
+            "esri/Color"
+        ], function (ClosestFacilityTask, ClosestFacilityParameters, FeatureSet, Graphic, Point,SimpleLineSymbol,Color) {
+
+            NAparams = new ClosestFacilityParameters();
+            NAparams.returnRoutes = true;
+
+            let facilities = new FeatureSet();
+            facilities.features = [new Graphic(new Point(6304047.245, 8157519.766, mapCopy.spatialReference)),
+                                   new Graphic(new Point(6359320.8593, 8004508.7757, mapCopy.spatialReference)),
+                                   new Graphic(new Point(6310216.6529, 8247780.4975, mapCopy.spatialReference))];
+
+            NAparams.facilities = facilities;
+            NAparams.outSpatialReference = mapCopy.spatialReference;
+
+
+            let incidents = new FeatureSet();
+            incidents.features = [new Graphic(new Point(6381746.283, 8171622.345, mapCopy.spatialReference))];
+            NAparams.incidents = incidents;   
+
+            closestFacilityTask = new ClosestFacilityTask("http://maps.psu.ru:8080/arcgis/rest/services/KUB/network_river/NAServer/make_route")
+
+            closestFacilityTask.solve(NAparams, function(solveResult){
+                console.log(solveResult)
+                route = solveResult.routes[0]
+                route.symbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0,255,255],0.25), 4.5);
+                mapCopy.graphics.add(route);
+            })
+        })
     }
 
     return {
