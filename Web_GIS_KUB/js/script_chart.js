@@ -459,7 +459,7 @@ function recalcPDK() {
         // clear limit line
         myBar.chart.annotation.options.annotations.pop();
 
-        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Единиц ПДК"
+        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Доля ПДК"
 
         document.getElementById("recalcPDK").innerHTML = "Вернуть абсолютные значения";
 
