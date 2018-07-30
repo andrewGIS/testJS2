@@ -9,6 +9,7 @@ var profileMaker = function () {
     var step = 1000;; // step for profile
     var mapCopyClicker; // clciker map
     var clickedPoint;// storing cliked point
+    var current_job;// storing current job id
 
 
 
@@ -23,6 +24,9 @@ var profileMaker = function () {
 
         $("#map").css("bottom", "calc(20px + 25% + 2px)");
         $("#profileContainer").show();
+        $("#layerListDom").css("bottom", "calc(20px + 25% + 2px + 50px)");
+        $("#searchPanel").css("bottom", "calc(20px + 25% + 2px)");
+        $("#rightPanel").css("bottom", "calc(20px + 25% + 2px)");
 
 
         require([
@@ -34,7 +38,7 @@ var profileMaker = function () {
             "esri/graphic",
             "esri/geometry/Point",
 
-        ], function ( SimpleMarkerSymbol, SimpleLineSymbol, GraphicsLayer, Geoprocessor, Color, Graphic, Point) {
+        ], function (SimpleMarkerSymbol, SimpleLineSymbol, GraphicsLayer, Geoprocessor, Color, Graphic, Point) {
 
             gp = new Geoprocessor("http://maps.psu.ru:8080/arcgis/rest/services/KUB/get_line/GPServer/get_line");
             grLayerRiver = new GraphicsLayer();
@@ -51,6 +55,11 @@ var profileMaker = function () {
             profile_chart = new Highcharts.chart('profile_graph', {
                 xAxis: {
                     categories: []
+                },
+                yAxis: {
+                    title: {
+                        text: null
+                    }
                 },
                 plotOptions: {
                     series: {
@@ -85,7 +94,10 @@ var profileMaker = function () {
                 }],
                 title: {
                     // Title of chart as Профиль реки и выбранная река
-                    text: "Профиль реки " + $("label[for='" + $("#river_choice :checked").attr('id') + "']").html()
+                    text: "Профиль реки " + $("label[for='" + $("#river_choice :checked").attr('id') + "']").html(),
+                    style: {
+                        fontSize: "16px"
+                    }
                 }
 
             })
@@ -139,10 +151,10 @@ var profileMaker = function () {
     // handle gP error
     function statusGp(e) {
         // profile_chart.hideLoading();
+        current_job = e;
         console.log(e.jobStatus);
 
     }
-
 
     // success gP
     function successGp(job) {
@@ -187,7 +199,7 @@ var profileMaker = function () {
         profile_chart.hideLoading();
 
         // profile_chart.setTitle({ text: "Профиль реки " + $("label[for='" + $("#river_choice :checked").attr('id') + "']").html() });
-        profile_chart.setTitle({ text: "Результат расчета "});
+        profile_chart.setTitle({ text: "Результат расчета " });
         profile_chart.series[0].setData(dataArr);
         profile_chart.xAxis[0].setCategories(labelsArr);
 
@@ -196,6 +208,10 @@ var profileMaker = function () {
 
     // clear element of Profile
     function resetProfileMaker() {
+
+        $("#searchPanel").css("bottom", "20px");
+        $("#layerListDom").css("bottom", "80px");
+        $("#rightPanel").css("bottom", "20px");
         $("#profileContainer").hide();
         $("#map").css("bottom", "20px");
         $("#river_choice").off();
@@ -204,7 +220,14 @@ var profileMaker = function () {
         grLayerPnt.clear(); // clear point
         grLayerRiver.clear();// clear river
         mapCopyClicker.remove(); // remove event handler for map click
-    }
+
+        // cancelling job
+        gp.cancelJob(current_job.jobId, function (info) {
+            console.log(info.jobStatus);// reset job
+        }, function (info) {
+            console.log(info.jobStatus);
+        });
+    };
 
     // draw selected route on map
     function drawRoute(feature) {
