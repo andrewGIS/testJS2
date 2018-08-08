@@ -6,19 +6,14 @@ require([
 	"esri/tasks/query", "esri/tasks/QueryTask", "esri/tasks/RelationshipQuery", "esri/tasks/GeometryService",
 	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar",
 	"esri/layers/GraphicsLayer",
-
-
-
 	"esri/tasks/Geoprocessor",
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
 	"esri/tasks/GenerateRendererParameters", "esri/tasks/GenerateRendererTask",
 	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
 	"esri/tasks/FindTask", "esri/tasks/FindParameters",
 	"esri/tasks/FeatureSet", "esri/dijit/FeatureTable",
-
 	"esri/TimeExtent", "esri/dijit/TimeSlider",
 	"dojo/_base/array",
-
 	"dgrid/Grid",
 	"dijit/registry",
 	"dojo/dom-construct", "dojo/ready", "dojo/on", "dojo/dom", "dojo/dom-class", "dojo/dom-style", "dojo/_base/connect",
