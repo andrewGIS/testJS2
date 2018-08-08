@@ -221,12 +221,19 @@ var profileMaker = function () {
         grLayerRiver.clear();// clear river
         mapCopyClicker.remove(); // remove event handler for map click
 
-        // cancelling job
-        gp.cancelJob(current_job.jobId, function (info) {
-            console.log(info.jobStatus);// reset job
-        }, function (info) {
-            console.log(info.jobStatus);
-        });
+        // cancelling job if not wait end
+        try {
+            gp.cancelJob(current_job.jobId, function (info) {
+                console.log(info.jobStatus);// reset job
+            }, function (info) {
+                console.log(info.jobStatus);
+            });
+            
+        } catch (error) {
+            // handle error if job is not started
+            console.log("Job not started")
+        }
+        
     };
 
     // draw selected route on map
