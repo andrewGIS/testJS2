@@ -5,7 +5,7 @@ function returnBlankTemplate() {
             "color": "#4dc9f6",
             "alias": "CI",
             "values": [],
-            "limit": [0, 0],
+            "limit": [350, 300],
             "class": "macro"
         },
         "co": {
@@ -93,7 +93,7 @@ function returnBlankTemplate() {
             "class": "micro"
         },
         "mg": {
-            "color": "#2dc7ff",
+            "color": "#hdc7ff",
             "alias": "Mg",
             "values": [],
             "limit": [50, 40],

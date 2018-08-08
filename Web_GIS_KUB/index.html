@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
 	<meta name="author" content="Rinat Abdullin, Perm 2017, Andrey Tarasov, Perm 2018">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="keywords" content="ГИС, Кизел, КУБ, шахты">
@@ -15,6 +16,8 @@
 	<link rel="stylesheet" href="css/modal.css">
 	<link rel="stylesheet" href="css/find.css">
 	<link rel="stylesheet" href="css/jquery.multiselect.css">
+	<link rel="stylesheet" href="css/profile_maker.css">
+	<!--<link rel="stylesheet" href="css/jquery.mCustomScrollbar.css">-->
 	<!--<link rel="stylesheet" href="css/baron.css">-->
 	<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>-->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
@@ -25,7 +28,7 @@
 
 	<!--<script type="text/javascript" src="js/script.js"></script>-->
 	<!--<script type="text/javascript" src="js/script_all.js"></script>-->
-	<script type="text/javascript" src="js/scriptMerge.js"></script>
+	<script type="text/javascript" src="js/script_merge.js"></script>
 
 
 
@@ -35,6 +38,10 @@
 	<script type="text/javascript" src="js/chartjs-plugin-annotation.js"></script>
 	<script type="text/javascript" src="js/jquery.multiselect.js"></script>
 	<script type="text/javascript" src="js/script_search.js"></script>
+	<script type="text/javascript" src="js/profile_maker.js"></script>
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+	<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+	<!--<script type="text/javascript" src="js/jquery.mCustomScrollbar.concat.min.js"></script>-->
 	<!--<script type="text/javascript" src="js/baron.js"></script>-->
 	<!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
 
@@ -82,88 +89,90 @@
 						<img src="images/binoculars.png" style="width: 25px; height: 20px;">
 					</button>
 				</li>
+				<li>
+					<button id="ProfileBut" title="Построение профиля" class="mainButton">
+						<img src="images/graphic.jpg" style="width: 25px; height: 21px;">
+					</button>
+				</li>
 			</ul>
 		</div>
+		<!--<div id="layerListDom"></div>-->
+		<!--<div class="wrapper" style = "overflow-y: scroll; box-sizing: border-box; margin: 0px; border: 0px;">-->
 		<div id="layerListDom"></div>
-		<!--<div class="wrapper" style = "overflow-y: scroll; box-sizing: border-box; margin: 0px; border: 0px;">
-			<div class="scroller">
-				<div class="container">
-					<div id="layerListDom"></div>
-				</div>
-				<div class="scroller__bar"></div>
+		<!-- </div> -->
+		<!--<div class="scroller__bar"></div>-->
+		<!--</div>-->
+
+
+
+		<div id="caseTitlePaneBM" style="display:none;">
+			<div id="TitlePaneBM">
+				<table>
+					<tr>
+						<td>
+							<input type='checkbox' id="BaseMapTP" autocomplete="off">
+						</td>
+						<td>
+							<label for="BaseMapTP">Базовая карта</label>
+						</td>
+					</tr>
+				</table>
+				<hr color="#dfdfe2" size="1px">
+				<table>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="OSMTP" class='backingMap' value=1 autocomplete="off" checked/>
+						</td>
+						<td>
+							<label for="OSMTP">OpenStreetMap</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="RosReestrTP" class='backingMap' value=2 autocomplete="off" />
+						</td>
+						<td>
+							<label for="RosReestrTP">Карта Росреестра</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="ArcGISSI" class='backingMap' value=3 autocomplete="off" />
+						</td>
+						<td>
+							<label for="ArcGISSI">ArcGIS.Imagery</label>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type='radio' name='groupTP' id="ArcGISWM" class='backingMap' value=3 autocomplete="off" />
+						</td>
+						<td>
+							<label for="ArcGISWM">ArcGIS.World Topo Map</label>
+						</td>
+					</tr>
+				</table>
 			</div>
-		</div>-->
-
-
-	</div>
-	<div id="caseTitlePaneBM">
-		<div id="TitlePaneBM">
-			<table>
-				<tr>
-					<td>
-						<input type='checkbox' id="BaseMapTP" autocomplete="off">
-					</td>
-					<td>
-						<label for="BaseMapTP">Базовая карта</label>
-					</td>
-				</tr>
-			</table>
-			<hr color="#dfdfe2" size="1px">
-			<table>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="OSMTP" class='backingMap' value=1 autocomplete="off" checked/>
-					</td>
-					<td>
-						<label for="OSMTP">OpenStreetMap</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="RosReestrTP" class='backingMap' value=2 autocomplete="off" />
-					</td>
-					<td>
-						<label for="RosReestrTP">Карта Росреестра</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="ArcGISSI" class='backingMap' value=3 autocomplete="off" />
-					</td>
-					<td>
-						<label for="ArcGISSI">ArcGIS.Imagery</label>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type='radio' name='groupTP' id="ArcGISWM" class='backingMap' value=3 autocomplete="off" />
-					</td>
-					<td>
-						<label for="ArcGISWM">ArcGIS.World Topo Map</label>
-					</td>
-				</tr>
-			</table>
 		</div>
-	</div>
-	<div id="dMeasurePane" style="display:none">
-		<div id="MIst"></div>
-	</div>
-	<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
-		<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
-		<div id="pager">
-			<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;">
-				<img src="images/arrow_previous.png" style="width: 20px; height: 20px;">
-			</button>
-			<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;">
-				<img src="images/arrow_next.png" style="width: 20px; height: 20px;">
-			</button>
-			<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;">
-				<img src="images/clear_select.png" style="width: 20px; height: 20px;">
-			</button>
+		<div id="dMeasurePane" style="display:none">
+			<div id="MIst"></div>
 		</div>
-		<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
-		<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"></div>
-		<!--<div id="headerIP">
+		<div id="rightPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
+			<div id="featureCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
+			<div id="pager">
+				<button id="previous" title="Предыдущий" style="height: 25px; width:45px; display: none;">
+					<img src="images/arrow_previous.png" style="width: 20px; height: 20px;">
+				</button>
+				<button id="next" title="Следующий" style="height: 25px; width:45px; display: none;">
+					<img src="images/arrow_next.png" style="width: 20px; height: 20px;">
+				</button>
+				<button id="clearSelBut" title="Очистить выборку" style="height: 25px; width:45px; display: none;">
+					<img src="images/clear_select.png" style="width: 20px; height: 20px;">
+				</button>
+			</div>
+			<div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'"></div>
+			<div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'top'"></div>
+			<!--<div id="headerIP">
 				<span id="headerIPText">Кликните по объекту для идентификации</span>
 				<button id="closeIP" style="display: none;">Очистить</button>
 			</div>
@@ -172,19 +181,43 @@
 			<div id="rightPanelContent">			
 				<div id="attTable" data-dojo-type="dijit/layout/ContentPane">
 			</div> -->
-	</div>
-	<div id="searchPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
-		<div id="searchCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
-		<div id="searchResults"></div>
-	</div>
-	<div id="footer1">
-		<div id="scale">| М 1:5'000'000</div>
-		<div id="coord">58.907°N, 45.106°E</div>
-	</div>
-	<div id="map">
-	</div>
-	</div>
+		</div>
+		<div id="searchPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="display:none;" class="rightPanel">
+			<div id="searchCount" style="margin-bottom:5px;">Кликните по объекту для идентификации</div>
+			<div id="searchResults"></div>
+		</div>
 
+		<div id="map">
+
+		</div>
+		<div id="profileContainer" style="display:none;">
+			<div id="profile_options">
+				<div id="profile_options_header">
+					Опции профиля
+				</div>
+				<form id="option_form">
+					<div id="options_container">
+						<li id="surface_choice">
+							<label class="description" for="element_2">Показатель </label>
+							<div>
+								<select class="element select medium" id="element_2" name="element_2">
+									<option value="outLine_h" selected="selected">Профиль рельефа</option>
+									<option value="outLine_hillshade">Расход</option>
+
+								</select>
+							</div>
+						</li>
+					</div>
+				</form>
+			</div>
+			<div id="profile_graph"></div>
+		</div>
+
+		<div id="footer1">
+			<div id="scale">| М 1:5'000'000</div>
+			<div id="coord">58.907°N, 45.106°E</div>
+		</div>
+	</div>
 
 	<!-- modal window code -->
 
@@ -206,7 +239,7 @@
 						<!--<fieldset id="modal-listDates">
 									</fieldset>-->
 					</form>
-					<form id="formIndicator"> Показатели
+					<form id="formIndicator"> Химический состав и показатели
 						<select multiple="multiple" id="lstIndicators" name="lstIndicators">
 							<optgroup id="macroElements" label="Микроэлементы">
 							</optgroup>
@@ -220,8 +253,8 @@
 
 				</div>
 				<div id="modal-buttons-div">
-					<button id="recalcPDK" class="modalButton">Пересчитать в ПДК</button>
-					<button id="showElements" class="modalButton" disabled>Данные по элементам</button>
+					<button id="recalcPDK" class="modalButton">Пересчитать в доли ПДК</button>
+					<button id="showElements" class="modalButton" disabled>Сбросить фильтры</button>
 					<button id="showFlowRate" class="modalButton" disabled>Данные по расходам</button>
 				</div>
 			</div>

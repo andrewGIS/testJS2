@@ -5,16 +5,15 @@ require([
 	"esri/symbols/SimpleMarkerSymbol", "esri/symbols/SimpleFillSymbol", "esri/symbols/SimpleLineSymbol",
 	"esri/tasks/query", "esri/tasks/QueryTask", "esri/tasks/RelationshipQuery", "esri/tasks/GeometryService",
 	"esri/dijit/Measurement", "esri/units", "esri/dijit/LayerList", "esri/dijit/Legend", "esri/dijit/Popup", "esri/dijit/PopupTemplate", "esri/dijit/HomeButton", "esri/dijit/OverviewMap", "esri/dijit/Scalebar",
-
+	"esri/layers/GraphicsLayer",
 	"esri/tasks/Geoprocessor",
 	"esri/tasks/ClassBreaksDefinition", "esri/tasks/AlgorithmicColorRamp",
 	"esri/tasks/GenerateRendererParameters", "esri/tasks/GenerateRendererTask",
 	"esri/tasks/IdentifyTask", "esri/tasks/IdentifyParameters",
 	"esri/tasks/FindTask", "esri/tasks/FindParameters",
-
+	"esri/tasks/FeatureSet", "esri/dijit/FeatureTable",
 	"esri/TimeExtent", "esri/dijit/TimeSlider",
 	"dojo/_base/array",
-
 	"dgrid/Grid",
 	"dijit/registry",
 	"dojo/dom-construct", "dojo/ready", "dojo/on", "dojo/dom", "dojo/dom-class", "dojo/dom-style", "dojo/_base/connect",
@@ -28,12 +27,14 @@ require([
 	SimpleMarkerSymbol, SimpleFillSymbol, SimpleLineSymbol,
 	Query, QueryTask, RelationshipQuery, GeometryService,
 	Measurement, Units, LayerList, Legend, Popup, PopupTemplate, HomeButton, OverviewMap, Scalebar,
+	GraphicsLayer,
 
 	Geoprocessor,
 	ClassBreaksDefinition, AlgorithmicColorRamp,
 	GenerateRendererParameters, GenerateRendererTask,
 	IdentifyTask, IdentifyParameters,
 	FindTask, FindParameters,
+	FeatureSet, FeatureTable,
 
 	TimeExtent, TimeSlider,
 	arrayUtils,
@@ -71,6 +72,12 @@ require([
 		var findParams, findTask;
 		var massPointLabels = ["Отвалы", "Изливы", "Родники"];
 		var identificationLayerId;
+		var trElemId;
+		var trElemIdTwo;
+		var rowColorInit;
+		var rowColorInitTwo;
+		var trElem;
+		var trElemTwo;
 
 		map.on('load', function (results) {
 			mMeasure = new Measurement({
@@ -143,6 +150,8 @@ require([
 		ArcGISWI.hide();
 		ArcGISWTM.hide();
 
+		var grPollPnt = new GraphicsLayer();
+		map.addLayer(grPollPnt);
 
 		var overviewMapDijit = new OverviewMap({
 			map: map,
@@ -221,8 +230,6 @@ require([
 		on(dom.byId("LayList"), "click", function () {
 			if (dom.byId('layerListDom').style.display == 'none') {
 
-				/*baron('.wrapper');*/
-
 				$(this).toggleClass("activeButton");
 				$("#layerListDom").show();
 				$("#layerListDom").hover(function () {
@@ -240,10 +247,9 @@ require([
 
 		//Кнопка картографическая основа
 		on(dom.byId("BaseMapChange"), "click", function () {
-			if (dom.byId('caseTitlePaneBM').style.display == 'none') {
+			if (dom.byId('caseTitlePaneBM').style.display == "none") {
 				dom.byId('caseTitlePaneBM').style.display = 'block';
 				$("#searchPanel, #rightPanel, #dMeasurePane").hide();
-				//dom.byId('dMeasurePane').style.display = 'none';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
@@ -265,6 +271,7 @@ require([
 				mapClick.remove();
 				cursorOut();
 				map.graphics.clear();
+				grPollPnt.clear();
 			} else {
 				dom.byId('dMeasurePane').style.display = 'none';
 				destroyMeasure();
@@ -290,6 +297,9 @@ require([
 				$('#clearSelBut, #previous, #next').hide();
 				$('#featureCount').html('Кликните по объекту для идентификации');
 				$("#searchPanel, #dMeasurePane, #caseTitlePaneBM").hide();
+				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+				document.getElementById('rightPane').innerHTML = '';
+				//document.getElementById('pager').innerHTML = '';
 				document.getElementById('map').style.right = '290px';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
@@ -304,6 +314,10 @@ require([
 				$('#rightPane').html('');
 				mapClick.remove();
 				map.graphics.clear();
+				grPollPnt.clear();
+				document.getElementById('clearSelBut').style.display = 'none';
+				document.getElementById('previous').style.display = 'none';
+				document.getElementById('next').style.display = 'none';
 				cursorOut();
 			}
 		});
@@ -323,8 +337,10 @@ require([
 			//$("#searchPanel").toggleClass("activeTab");
 			if (dom.byId('searchPanel').style.display == 'none') {
 				map.graphics.clear();
+				grPollPnt.clear();
 				dom.byId('searchPanel').style.display = 'block';
 				$("#rightPanel, #dMeasurePane, #caseTitlePaneBM").hide();
+				//$("#rightPanel").html("");
 				$("#featureCount").html('Кликните по объекту для идентификации');
 				$('#clearSelBut').hide();
 				$('#previous').hide();
@@ -336,13 +352,14 @@ require([
 				mMeasure.clearResult();
 				finder.copyVars(findParams, findTask, map, new Graphic(), setSelectionSymbol("point"), setSelectionSymbol("polygon"), setSelectionSymbol("polyline"));
 				finder.builtFinder();
+				mapClick.remove();
+				cursorOut();
 			} else {
 				dom.byId('searchPanel').style.display = 'none';
-				//dom.byId('rightPanel').style.display = 'block';
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPanel').innerHTML = '';
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				map.graphics.clear();
+				grPollPnt.clear();
 				$('#clearSelBut').hide();
 				$('#previous').hide();
 				$('#next').hide();
@@ -350,6 +367,25 @@ require([
 				cursorOut();
 			}
 		});
+
+		// Панель профиля
+		on(dom.byId("ProfileBut"), "click", function () {
+			//$("#searchPanel").toggleClass("activeTab");
+			$(this).toggleClass("activeButton");
+			if (dom.byId('profileContainer').style.display == 'none') {
+				profileMaker.copyVars(map);
+				profileMaker.initProfileMaker();
+				map.graphics.clear();
+				grPollPnt.clear();
+				mMeasure.setTool("area", false);
+				mMeasure.setTool("distance", false);
+				mMeasure.setTool("location", false);
+				mMeasure.clearResult();
+			} else {
+				profileMaker.resetProfileMaker();
+			}
+		});
+
 
 		// Функции для изменения указателя мыши
 		function cursorOver() { map.setMapCursor("help"); };
@@ -360,6 +396,7 @@ require([
 			document.getElementById('rightPane').innerHTML = '';
 			document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 			map.graphics.clear();
+			grPollPnt.clear();
 			document.getElementById('clearSelBut').style.display = 'none';
 			document.getElementById('previous').style.display = 'none';
 			document.getElementById('next').style.display = 'none';
@@ -478,8 +515,9 @@ require([
 					&& key !== "objectid_1"
 				) {
 
-					// round float fields values, other stay as they are
-					let formattedValue = parseFloat(value) ? parseFloat(value).toFixed(2) : value
+					// round float fields values, other stay as they are, also parsing integer number as integer
+					let formattedValue = parseFloat(value) ? parseFloat(value).toFixed(2) % 1 == 0 ?
+						parseFloat(value).toFixed(0): parseFloat(value).toFixed(2): value
 
 					currentContent += "<tr><td class='tdGray'>" + key + "</td><td>" +
 						formattedValue + "</td></tr>"
@@ -487,17 +525,50 @@ require([
 
 			});
 
-			if (currentObject.layerId === 6 ||
+			if (currentObject.layerId === 5 ||
+				currentObject.layerId === 6 ||
 				currentObject.layerId === 7 ||
 				currentObject.layerId === 8 ||
-				currentObject.layerId === 9) {
-				currentContent += "<tr><td><button id = 'addInfo' class = 'modalButton' style = 'font-size: 13px;padding:0'> Доп.информация </button></td></tr>"
+				currentObject.layerId === 9 ||
+				currentObject.layerId === 12) {
+				currentContent += "<tr><td colspan='2' style = 'text-align:center'><button id = 'addInfo' class = 'modalButton' style = 'font-size: 13px;padding:0'> Дополнительная информация </button></td></tr>"
 			}
 
 			if (currentObject.layerId === 23 ||
 				currentObject.layerId === 24) {
 				currentContent += "<tr><td colspan='2' style='text-align:center;'>Источники загрязнения</td></tr>"
 				currentContent += "<tr><td colspan='2'><canvas id='chart-area' width='230px' height='230px'></canvas></td></tr>"
+			}
+
+			if (currentObject.layerId == 9 && (currentObject.feature.attributes.OBJECTID == 1 ||
+				currentObject.feature.attributes.OBJECTID == 2 ||
+				currentObject.feature.attributes.OBJECTID == 3 ||
+				currentObject.feature.attributes.OBJECTID == 4 ||
+				currentObject.feature.attributes.OBJECTID == 6 ||
+				currentObject.feature.attributes.OBJECTID == 7 ||
+				currentObject.feature.attributes.OBJECTID == 8 ||
+				currentObject.feature.attributes.OBJECTID == 10 ||
+				currentObject.feature.attributes.OBJECTID == 11 ||
+				currentObject.feature.attributes.OBJECTID == 15 ||
+				currentObject.feature.attributes.OBJECTID == 16 ||
+				currentObject.feature.attributes.OBJECTID == 17 ||
+				currentObject.feature.attributes.OBJECTID == 21 ||
+				currentObject.feature.attributes.OBJECTID == 24 ||
+				currentObject.feature.attributes.OBJECTID == 25 ||
+				currentObject.feature.attributes.OBJECTID == 26 ||
+				currentObject.feature.attributes.OBJECTID == 27 ||
+				currentObject.feature.attributes.OBJECTID == 28 ||
+				currentObject.feature.attributes.OBJECTID == 29 ||
+				currentObject.feature.attributes.OBJECTID == 30 ||
+				currentObject.feature.attributes.OBJECTID == 31 ||
+				currentObject.feature.attributes.OBJECTID == 32 ||
+				currentObject.feature.attributes.OBJECTID == 33 ||
+				currentObject.feature.attributes.OBJECTID == 34 ||
+				currentObject.feature.attributes.OBJECTID == 35 ||
+				currentObject.feature.attributes.OBJECTID == 37 ||
+				currentObject.feature.attributes.OBJECTID == 38 ||
+				currentObject.feature.attributes.OBJECTID == 39)) {
+				currentContent += "<tr><td colspan='2' style = 'text-align:center'><button id = 'addTable' class = 'modalButton' style = 'font-size: 13px; padding:0; line-height:1.2em'> Список источников загрязнения<br>поверхностных вод </button></td></tr>"
 			}
 
 			currentContent += "</table>"
@@ -576,6 +647,7 @@ require([
 				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
 					" ( " + 1 + " из " + identifyResults.length + " )");
 				map.graphics.clear();
+				grPollPnt.clear();
 				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
 					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)))
 			}
@@ -596,6 +668,12 @@ require([
 			}
 
 			//on(dom.byId("addInfo"), "click", loadModal);
+			try {
+				on(dom.byId("addTable"), "click", selectObsBuss);
+			} catch (error) {
+				console.log("Кнопка не создана");
+				console.log(error);
+			}
 
 		}
 
@@ -613,6 +691,7 @@ require([
 				loadResults(selectedInfoNumber + 1);
 				selectedInfoNumber = selectedInfoNumber + 1;
 				map.graphics.clear();
+				grPollPnt.clear();
 				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
 					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)));
 				$("#featureCount").html("Выбрано объектов: " + identifyResults.length +
@@ -635,6 +714,7 @@ require([
 				loadResults(selectedInfoNumber - 1);
 				selectedInfoNumber = selectedInfoNumber - 1;
 				map.graphics.clear();
+				grPollPnt.clear();
 				map.graphics.add(new Graphic(identifyResults[selectedInfoNumber].feature.geometry,
 					setSelectionSymbol(identifyResults[selectedInfoNumber].feature.geometry.type)));
 
@@ -732,6 +812,149 @@ require([
 			}
 
 
+		}
+
+		//Remove table in DOM for list with pollution points
+		function removePollPnrTbl() {
+			$("#addTable").replaceWith("<button id = 'delTable' class = 'modalButton' style = 'font-size: 13px; padding:0; line-height:1.2em'> Скрыть список<br> источников загрязнения </button>");
+			$("#delTable").on("click", function () {
+				$("#delTable").replaceWith("<button id = 'addTable' class = 'modalButton' style = 'font-size: 13px; padding:0; line-height:1.2em'> Список источников загрязнения<br>поверхностных вод </button>");
+				$("#pollPntTable").remove();
+				grPollPnt.clear();
+				$("#addTable").on("click", selectObsBuss);
+			});
+		}
+
+		//Selection watershed in observation point for surface waters
+		function selectObsBuss() {
+			let ObservationBass = "http://maps.psu.ru:8080/arcgis/rest/services/KUB/ObservationBass/MapServer/0";
+			var qtBass = new QueryTask(ObservationBass);
+			var QueryObsBass = new Query();
+			QueryObsBass.where = "objectid = '" + [identifyResults[selectedInfoNumber].feature.attributes.OBJECTID] + "'";
+			QueryObsBass.returnGeometry = true;
+			QueryObsBass.maxAllowableOffset = 10;
+			QueryObsBass.outFields = ["*"];
+			qtBass.execute(QueryObsBass, function (results) {
+				selectPollPnt(results.features[0].geometry);
+			});
+		}
+
+		//Selection pollution points in watershed
+		function selectPollPnt(objectBass) {
+			var IdsPollutLyrForQuery = ["5", "6", "7"];
+			Promise.all(IdsPollutLyrForQuery.map(function (element) {
+				var urlLayerQuery = "http://maps.psu.ru:8080/arcgis/rest/services/KUB/Pollution_KUB/MapServer/" + element;
+				var qtPollPnt = new QueryTask(urlLayerQuery);
+				var queryPollPnt = new Query();
+				queryPollPnt.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
+				queryPollPnt.returnGeometry = true;
+				queryPollPnt.outFields = ["*"];
+				queryPollPnt.geometry = objectBass;
+				return qtPollPnt.execute(queryPollPnt, function (results) {
+					return results;
+				}, function (error) {
+					console.log(error);
+				});
+			})).then(values => showAddTable(values.map(function (e) {
+				return e.features;
+			})));
+		}
+
+		//Create table in DOM for list with pollution points
+		function showAddTable(objectPollPnt) {
+			console.log(objectPollPnt);
+			$("#rightPane").append('<div id="pollPntTable">');
+			$("#pollPntTable").html(createPollPntTable(objectPollPnt));
+			removePollPnrTbl();
+			$("#tblPollPnt").on("mouseenter", ".PollPnts", objectPollPnt, selectPollObject);
+			$("#tblPollPnt").on("mouseleave", ".PollPnts", objectPollPnt, clearPollObject);
+		}
+
+		//Create table with list pollution points in watershed
+		function createPollPntTable(objectPollPnt) {
+			var currentContentPollPnt = "<table id='tblPollPnt' cellpadding='1' cellspacing='0' style='text-align:center; font-size:8pt'>"
+			currentContentPollPnt += "<tr><td class='tdGray' colspan='3'style='text-align:center; font-size:13px; line-height:1.2em''>Источники загрязнения<br> поверхностных вод</td></tr>"
+			currentContentPollPnt += "<tr style='background-color:#ccd9d6'><td class='tdGray'>Тип</td><td>Название</td><td>Река-приемник<br> загрязненного стока</td></tr>"
+			var i;
+			var rowColor = '#dde7cc';
+			for (i = 0; i < objectPollPnt[0].length; i++) {
+				if (rowColor == '#f8eeb0') {
+					rowColor = '#dde7cc';
+				} else {
+					rowColor = '#f8eeb0';
+				}
+				currentContentPollPnt += "<tr class='PollPnts' id='" + objectPollPnt[0][i].attributes.objectid + objectPollPnt[0][i].attributes.nazvanie + "' style='background-color:" + rowColor + "'><td class='tdGray'>Отвал</td><td>" +
+					objectPollPnt[0][i].attributes.nazvanie + "</td><td>" +
+					objectPollPnt[0][i].attributes.river + "</td></tr>"
+			}
+			for (i = 0; i < objectPollPnt[1].length; i++) {
+				if (rowColor == '#f8eeb0') {
+					rowColor = '#dde7cc';
+				} else {
+					rowColor = '#f8eeb0';
+				}
+				currentContentPollPnt += "<tr class='PollPnts' id='" + objectPollPnt[1][i].attributes.objectid + objectPollPnt[1][i].attributes.nazvanie + "' style='background-color:" + rowColor + "'><td class='tdGray'>Излив</td><td>" +
+					objectPollPnt[1][i].attributes.nazvanie + "</td><td>" +
+					objectPollPnt[1][i].attributes.river + "</td></tr>"
+			}
+			for (i = 0; i < objectPollPnt[2].length; i++) {
+				if (rowColor == '#f8eeb0') {
+					rowColor = '#dde7cc';
+				} else {
+					rowColor = '#f8eeb0';
+				}
+				currentContentPollPnt += "<tr class='PollPnts' id='" + objectPollPnt[2][i].attributes.objectid + objectPollPnt[2][i].attributes.nazvanie + "' style='background-color:" + rowColor + "'><td class='tdGray'>Родник</td><td>" +
+					objectPollPnt[2][i].attributes.nazvanie + "</td><td>" +
+					objectPollPnt[2][i].attributes.river + "</td></tr>"
+			}
+			currentContentPollPnt += "</table>"
+
+			return currentContentPollPnt
+		}
+
+		//show pollution points on map
+		function selectPollObject(event) {
+			//console.log(this);
+			//console.log(event.data);
+			trElem = $(this);
+			trElemId = $(this).attr('id');
+			rowColorInit = $(this).attr('style');
+			if (trElemTwo != undefined) {
+				if (trElemId != trElemIdTwo) {
+					trElemTwo[0].attributes[2].value = rowColorInitTwo;
+				} else {
+					rowColorInit = rowColorInitTwo;
+				}
+			}
+			var i, j;
+			for (i = 0; i < event.data.length; i++) {
+				for (j = 0; j < event.data[i].length; j++) {
+					if (event.data[i][j].attributes.objectid + event.data[i][j].attributes.nazvanie == trElemId) {
+						grPollPnt.clear();
+						grPollPnt.add(new Graphic(event.data[i][j].geometry,
+							new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 15, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+								new Color([0, 0, 0]), 1.5), new Color([0, 150, 0, 0.8]))));
+						$(this).attr('style', 'background-color:#009600');
+					}
+				}
+			}
+		}
+
+		function clearPollObject() {
+			if ($(':hover').length > 4) {
+				if ($(':hover')[5].attributes[0].value == "pollPntTable") {
+					$(this).attr('style', rowColorInit);
+				} else {
+					rowColorInitTwo = rowColorInit;
+					trElemTwo = trElem;
+					trElemIdTwo = trElemId;
+				}
+			} else {
+				rowColorInitTwo = rowColorInit;
+				trElemTwo = trElem;
+				trElemIdTwo = trElemId;
+			}
+			// $(this).attr('style', rowColorInit);
 		}
 
 

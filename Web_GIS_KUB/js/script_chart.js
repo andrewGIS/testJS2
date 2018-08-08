@@ -13,6 +13,7 @@ var dataForChartRaw;// variable from samples with charts
 var currentLyrID; // source layer , used for choose necessary pdk limit
 var limitLine;// variable for store limit pdk value when only one indicator on graph
 var isFirstTimeLoad = true;// is first time to load 
+var add_prefix_to_line;// for label of limit line (for example ПДК рх )
 
 function modalListener() {
     // assert event handler for dom elements
@@ -67,6 +68,8 @@ function init() {
     // create data for Chart and show modal window and create check boxes
     $("#modal-name").css({ "display": "block" });
 
+    // calculate prefix for PDK for current object
+    add_prefix_to_line =  currentLyrID == 9 ? " рх " : " пх "
 
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
@@ -82,13 +85,13 @@ function init() {
     limitLine = [{
         type: 'line',
         mode: 'horizontal',
-        scaleID: 'y-axis-0',
+        scaleID: 'y-axis-1',
         value: indicatorsValues[firstElement]['limit'][limitNumber()],
         borderWidth: 5,
         borderColor: 'red',
         label: {
             backgroundColor: "red",
-            content: "Значение ПДК (" + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
+            content: "Значение ПДК " +add_prefix_to_line+"("+ + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
             enabled: true,
             // for determination side of label above or below line
             yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - indicatorsValues[firstElement]['limit'][limitNumber()] > 0 ? -10 : 10,
@@ -115,7 +118,7 @@ function init() {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: firstElement == "rashod"?'Расход, м³/сек':'Значение показателя, мг/дм³',
+                        labelString: firstElement == "rashod"?'Расход, м³/сек':'мг/дм³',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",
@@ -130,16 +133,38 @@ function init() {
                         let labelsCount = 3;
                         axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
 
-                    }
+                    },
+                    id: 'y-axis-0'
+                },{
+                    scaleLabel: {
+                        display: true,
+                        labelString: "ph",
+                        fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
+                        fontSize: 14,
+                        fontStyle: "bold",
+                    },
+                    position: 'right',
+                    type: 'logarithmic',
+                    ticks: {
+                        callback: function (value, index, values) {//needed to change the scientific notation results from using logarithmic scale
+                            return value.toFixed(3);//pass tick values as a string into Number function
+                        }
+                    },
+                    afterBuildTicks: function (axe) {
+                        let labelsCount = 3;
+                        axe.ticks = range(0, axe.max, axe.max / labelsCount);// fill count defined labels depends on max value of chart 
+
+                    },
+                    id: 'y-axis-1'
                 }],
                 xAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: 'Даты обследований',
+                        //labelString: 'Даты обследований',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",
-                        padding: 4,
+                        padding: 4
                     }
                 }]
 
@@ -230,7 +255,7 @@ function addDate(dateValue, position) {
 
                     var indicatorValue = selectedDataObj[dateValue][indicator]
 
-                    if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
+                    if (document.getElementById("recalcPDK").innerHTML == "Вернуть абсолютные значения") {
 
                         var pdkValue = indicatorValue / indicatorsValues[indicator]['limit'][limitNumber()]
 
@@ -319,10 +344,11 @@ function createCheckboxesIndicator(arr) {
     $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
         let element = value.firstChild.defaultValue;
         if (elements[element]['limit'][limitNumber()]){
-            $(value).css("background-color","#c8ff49")
+            //$(value).css("background-color","#c8ff49")
+            $(value).css("background-color","#ff0000")
         }
         else {
-            $(value).css("background-color",'#f27e2b')
+            //$(value).css("background-color",'#f27e2b')
         }
     });
 
@@ -409,7 +435,7 @@ function addIndicator(indicatorName) {
 
     // check how to add data in pdk or not
 
-    if (document.getElementById("recalcPDK").innerHTML == "Вернуть значения") {
+    if (document.getElementById("recalcPDK").innerHTML == "Вернуть абсолютные значения") {
 
         // dataToAdd = indicatorsValues[indicatorName]['values'].map(function (value) {
         dataToAdd = arrValues.map(function (value) {
@@ -437,7 +463,8 @@ function addIndicator(indicatorName) {
         backgroundColor: indicatorsValues[indicatorName]['color'],
         borderColor: indicatorsValues[indicatorName]['color'],
         borderWidth: 1,
-        data: dataToAdd
+        data: dataToAdd,
+        yAxisID: indicatorName == "ph" ? 'y-axis-1' : 'y-axis-0',
     };
 
     barChartData.datasets.push(newDataset);
@@ -458,9 +485,9 @@ function recalcPDK() {
         // clear limit line
         myBar.chart.annotation.options.annotations.pop();
 
-        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Единиц ПДК"
+        myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Доля ПДК"
 
-        document.getElementById("recalcPDK").innerHTML = "Вернуть значения";
+        document.getElementById("recalcPDK").innerHTML = "Вернуть абсолютные значения";
 
         barChartData.datasets.forEach(function (dataset) {
 
@@ -588,8 +615,24 @@ function toggleTable() {
                 $(value).removeAttr("selected")
             }
         })
+
         $("#lstIndicators").multiselect('reload');
-        $("#lstIndicators").trigger("onSelectAll")
+        $("#lstIndicators").trigger("onSelectAll");
+
+        // return background of elements
+        let elements = returnBlankTemplate();
+        $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
+            let element = value.firstChild.defaultValue;
+            if (elements[element]['limit'][limitNumber()]){
+                //$(value).css("background-color","#c8ff49")
+                $(value).css("background-color","#ff0000")
+            }
+            else {
+                //$(value).css("background-color",'#f27e2b')
+            }
+        });
+
+
     }
 }
 
@@ -620,7 +663,7 @@ function limitNumber() {
 }
 
 function setLine() {
-    if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть значения") {
+    if (myBar.chart.config.data.datasets.length == 1 && $("#recalcPDK").text() != "Вернуть абсолютные значения") {
 
         // disable button recalc pdk for pH
         // if (myBar.chart.config.data.datasets[0].label == "pH") {
@@ -630,9 +673,11 @@ function setLine() {
         let currentIndicatorAlias = myBar.chart.config.data.datasets[0].label
         let elements = returnBlankTemplate();
         let pdkValue;
+        let current_element;
         $.each(elements, function (key, value) {
             if (elements[key]['alias'] == currentIndicatorAlias) {
                 pdkValue = elements[key]['limit'][limitNumber()];
+                current_element = key;
             };
         });
 
@@ -655,13 +700,13 @@ function setLine() {
             drawTime: 'afterDatasetsDraw',
             type: 'line',
             mode: 'horizontal',
-            scaleID: 'y-axis-0',
+            scaleID: current_element == 'ph'?'y-axis-1':'y-axis-0',// select neccessary axe for limit line
             value: pdkValue,
             borderWidth: 5,
             borderColor: 'red',
             label: {
                 backgroundColor: "red",
-                content: "Значение ПДК (" + pdkValue + ")",
+                content: "Значение ПДК " + add_prefix_to_line+"(" + + pdkValue + ")",
                 enabled: true,
                 position: "center",
                 // for showing label in chart

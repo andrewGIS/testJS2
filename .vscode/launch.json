@@ -6,7 +6,7 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "file": "D:\\Work\\KUB_WEB_GIS\\testJS2\\Web_GIS_KUB\\index.html"
+            "file": "D:\\Work\\_not_ended_tasks\\KUB_WEB_GIS\\testJS2\\Web_GIS_KUB\\index.html"
         }
     ]
 }
