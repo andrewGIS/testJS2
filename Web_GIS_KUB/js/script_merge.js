@@ -291,7 +291,11 @@ require([
 		// Инфопанель справа
 		on(dom.byId("InfoBut"), "click", function () {
 			if (dom.byId('rightPanel').style.display == 'none') {
-				dom.byId('rightPanel').style.display = 'block';
+				$('#rightPane').html("");
+				//dom.byId('rightPanel').style.display = 'block';
+				$('#rightPanel').show();
+				$('#clearSelBut, #previous, #next').hide();
+				$('#featureCount').html('Кликните по объекту для идентификации');
 				$("#searchPanel, #dMeasurePane, #caseTitlePaneBM").hide();
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				document.getElementById('rightPane').innerHTML = '';
@@ -304,10 +308,10 @@ require([
 				mapClick = map.on("click", doIdentify);
 				cursorOver();
 			} else {
+				$('#rightPanel').hide();
 				dom.byId('rightPanel').style.display = 'none';
 				document.getElementById('map').style.right = '40px';
-				document.getElementById('rightPane').innerHTML = '';
-				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
+				$('#rightPane').html('');
 				mapClick.remove();
 				map.graphics.clear();
 				grPollPnt.clear();
