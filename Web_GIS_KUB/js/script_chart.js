@@ -69,14 +69,15 @@ function init() {
     $("#modal-name").css({ "display": "block" });
 
     // calculate prefix for PDK for current object
-    add_prefix_to_line =  currentLyrID == 9 ? " рх " : " пх "
+    add_prefix_to_line =  currentLyrID == 9 ? "рх " : "пх "
 
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
         datasets: [{
             label: indicatorsValues[firstElement]['alias'],
             backgroundColor: indicatorsValues[firstElement]['color'],
-            data: indicatorsValues[firstElement]['values']
+            data: indicatorsValues[firstElement]['values'],
+            yAxisID: 'y-axis-1'
         }]
 
     };
@@ -91,7 +92,7 @@ function init() {
         borderColor: 'red',
         label: {
             backgroundColor: "red",
-            content: "Значение ПДК " +add_prefix_to_line+"("+ + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
+            content: "Значение ПДК" +add_prefix_to_line+"("+ + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
             enabled: true,
             // for determination side of label above or below line
             yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - indicatorsValues[firstElement]['limit'][limitNumber()] > 0 ? -10 : 10,
@@ -211,7 +212,7 @@ function loadModal(dataForChart, layerID) {
     colorNames = Object.keys(window.chartColors);
     targetCanvas = document.getElementById("modal-canvas").getContext("2d");
     firstElement = "ph";
-    $("#recalcPDK").html("Пересчитать в ПДК");
+    $("#recalcPDK").html("Пересчитать в доли ПДК");
     $("#recalcPDK").prop("disabled", false);
     $("#showElements").prop("disabled", false);
     if (dataForChart.length > 1) {
@@ -478,7 +479,7 @@ function recalcPDK() {
     //console.log(currentLyrID);
 
 
-    if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в ПДК") {
+    if (document.getElementById("recalcPDK").innerHTML == "Пересчитать в доли ПДК") {
 
         // rename axe y
 
@@ -516,7 +517,7 @@ function recalcPDK() {
         myBar.chart.scales['y-axis-0'].options.scaleLabel.labelString = "Значение показателя, мг/дм³";
 
 
-        document.getElementById("recalcPDK").innerHTML = "Пересчитать в ПДК";
+        document.getElementById("recalcPDK").innerHTML = "Пересчитать в доли ПДК";
 
         setLine();
 
@@ -706,7 +707,7 @@ function setLine() {
             borderColor: 'red',
             label: {
                 backgroundColor: "red",
-                content: "Значение ПДК " + add_prefix_to_line+"(" + + pdkValue + ")",
+                content: "Значение ПДК" + add_prefix_to_line+"(" + + pdkValue + ")",
                 enabled: true,
                 position: "center",
                 // for showing label in chart

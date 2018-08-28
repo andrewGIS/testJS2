@@ -10,7 +10,7 @@ function returnBlankTemplate() {
         },
         "co": {
             "color": "#e4d6a7",
-            "alias": "CO",
+            "alias": "Co",
             "values": [],
             "limit": [0.1, 0.01],
             "class": "micro"
