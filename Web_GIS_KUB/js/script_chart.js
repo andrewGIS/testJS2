@@ -28,6 +28,7 @@ function modalListener() {
         $(".modal").css({ "display": "none" });
         $("#addInfo").off();
         $("#toggleTable").off();
+        //$("#showDepth").off();
 
         // show list indicator after closing window
         $("#formIndicator").show();
@@ -51,6 +52,7 @@ function modalListener() {
     $("#recalcPDK").on('click', recalcPDK);
     $("#showElements").on('click', toggleTable);
     $("#showFlowRate").on('click', toggleTable);
+    $("#showDepth").on('click', toggleTable_depth);
 
 }
 
@@ -69,7 +71,7 @@ function init() {
     $("#modal-name").css({ "display": "block" });
 
     // calculate prefix for PDK for current object
-    add_prefix_to_line =  currentLyrID == 9 ? "рх " : "пх "
+    add_prefix_to_line = currentLyrID == 9 ? "рх " : "пх "
 
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
@@ -77,7 +79,7 @@ function init() {
             label: indicatorsValues[firstElement]['alias'],
             backgroundColor: indicatorsValues[firstElement]['color'],
             data: indicatorsValues[firstElement]['values'],
-            yAxisID: 'y-axis-1'
+            yAxisID: firstElement == "ph" ? 'y-axis-1' : 'y-axis-0'
         }]
 
     };
@@ -92,7 +94,7 @@ function init() {
         borderColor: 'red',
         label: {
             backgroundColor: "red",
-            content: "Значение ПДК" +add_prefix_to_line+"("+ + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
+            content: "Значение ПДК" + add_prefix_to_line + "(" + + indicatorsValues[firstElement]['limit'][limitNumber()] + ")",
             enabled: true,
             // for determination side of label above or below line
             yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - indicatorsValues[firstElement]['limit'][limitNumber()] > 0 ? -10 : 10,
@@ -119,7 +121,7 @@ function init() {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: firstElement == "rashod"?'Расход, м³/сек':'мг/дм³',
+                        labelString: firstElement == "rashod" ? 'Расход, м³/сек' : firstElement == "h_vod" ? "м" : 'мг/дм³',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",
@@ -136,7 +138,7 @@ function init() {
 
                     },
                     id: 'y-axis-0'
-                },{
+                }, {
                     scaleLabel: {
                         display: true,
                         labelString: "ph",
@@ -215,11 +217,19 @@ function loadModal(dataForChart, layerID) {
     $("#recalcPDK").html("Пересчитать в доли ПДК");
     $("#recalcPDK").prop("disabled", false);
     $("#showElements").prop("disabled", false);
-    if (dataForChart.length > 1) {
+    // check what buttons is should be enable
+    if (dataForChart.length > 1 && currentLyrID !== 8) {
         $("#showFlowRate").prop("disabled", false);
     }
     else {
         $("#showFlowRate").prop("disabled", true);
+    }
+    // enable button for specific layer
+    if (currentLyrID == 8) {
+        $("#showDepth").prop("disabled", false);
+    }
+    else {
+        $("#showDepth").prop("disabled", true);
     }
 
     init();
@@ -327,7 +337,7 @@ function createCheckboxesIndicator(arr) {
 
     });
 
-    
+
 
     $('#lstIndicators').multiselect({
         columns: 5,
@@ -342,11 +352,11 @@ function createCheckboxesIndicator(arr) {
 
     // change background if possible to calc pdk
     let elements = returnBlankTemplate();
-    $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
+    $.each($("form[id=formIndicator] div[class=ms-options] label"), function (key, value) {
         let element = value.firstChild.defaultValue;
-        if (elements[element]['limit'][limitNumber()]){
+        if (elements[element]['limit'][limitNumber()]) {
             //$(value).css("background-color","#c8ff49")
-            $(value).css("background-color","#ff0000")
+            $(value).css("background-color", "#ff0000")
         }
         else {
             //$(value).css("background-color",'#f27e2b')
@@ -550,7 +560,7 @@ function pushElementsValues(ObjectForFill, index) {
     // writing data from object to template which are in elemenets.js
     //storing the default data
     nativeData = ObjectForFill.valueOf();
-    elements = (index == 1) ? returnBlankTemplate() : returnSecondTemplate();
+    elements = (index == 1) ? returnBlankTemplate() : (index == 2) ? return_depth_template() : returnSecondTemplate();
     for (var key in elements) {
         elements[key].values = ObjectForFill.map(function (e) {
             for (let dateValue in e) {
@@ -567,7 +577,7 @@ function toggleTable() {
     //console.log(dataForChartRaw[1])
     if (this.id == "showFlowRate") {
         myBar.destroy();
-        indicatorsValues = pushElementsValues(dataForChartRaw[1], 2);
+        indicatorsValues = pushElementsValues(dataForChartRaw[1], 3);
         dateValues = dataForChartRaw[1].map(function (e) { return parseInt(Object.keys(e)[0]) });
         charTitle = "Данные по расходам"; // get name from first object
         color = Chart.helpers.color;
@@ -578,7 +588,8 @@ function toggleTable() {
             datasets: [{
                 label: indicatorsValues[firstElement]['alias'],
                 backgroundColor: indicatorsValues[firstElement]['color'],
-                data: indicatorsValues[firstElement]['values']
+                data: indicatorsValues[firstElement]['values'],
+                yAxisID: 'y-axis-0'
             }]
 
         };
@@ -622,11 +633,110 @@ function toggleTable() {
 
         // return background of elements
         let elements = returnBlankTemplate();
-        $.each($("form[id=formIndicator] div[class=ms-options] label"),function (key,value){
+        $.each($("form[id=formIndicator] div[class=ms-options] label"), function (key, value) {
             let element = value.firstChild.defaultValue;
-            if (elements[element]['limit'][limitNumber()]){
+            if (elements[element]['limit'][limitNumber()]) {
                 //$(value).css("background-color","#c8ff49")
-                $(value).css("background-color","#ff0000")
+                $(value).css("background-color", "#ff0000")
+            }
+            else {
+                //$(value).css("background-color",'#f27e2b')
+            }
+        });
+
+
+    }
+}
+
+function toggleTable_depth() {
+    // function for showing depth of current object
+    // should working for layer 8 
+    //console.log(dataForChartRaw[1])
+    if (this.id == "showDepth") {
+        myBar.destroy();
+        indicatorsValues = pushElementsValues(dataForChartRaw[1], 2);
+        dateValues = dataForChartRaw[1].map(function (e) { return parseInt(Object.keys(e)[0]) });
+        charTitle = "Данные по глубине "+dataForChartRaw[1][0][dateValues[0]]["name"]; // get name from first object
+        color = Chart.helpers.color;
+        colorNames = Object.keys(window.chartColors);
+        firstElement = "h_vod";
+        barChartData = {
+            labels: dateValues.map(function (e) { return formateDate(e) }),
+            datasets: [{
+                label: indicatorsValues[firstElement]['alias'],
+                backgroundColor: indicatorsValues[firstElement]['color'],
+                data: indicatorsValues[firstElement]['values'],
+                yAxisID: 'y-axis-0',
+            }]
+
+        };
+        $('#lstIndicators').multiselect('disable', true);
+        //$("#lstDates").multiselect('reset');
+        $("#lstDates").empty();
+        createCheckboxesDates(dateValues);
+        $("#lstDates").multiselect('reload');
+        init();
+        $("#formIndicator").hide();
+        $("#recalcPDK").prop("disabled", true);
+
+
+        // specific limit line
+        // set limitLine
+        var line_value = dataForChartRaw[1][0][dateValues[0]]["abs_otm_dn"]
+        myBar.chart.annotation.options.annotations[0] = {
+            drawTime: 'afterDatasetsDraw',
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-0' ,// select neccessary axe for limit line
+            value: line_value,
+            borderWidth: 5,
+            borderColor: "#666666",
+            label: {
+                backgroundColor: "#666666",
+                content: "Абсолютная высота дневной поверхности - " +line_value + " м",// get absolute height from first object
+                enabled: true,
+                position: "center",
+                yAdjust: Math.max.apply(null, barChartData.datasets[0].data) -  line_value > 0 ? -10 : 10,
+            }
+        }
+        myBar.update();
+
+
+    }
+    else {
+        myBar.destroy();
+        $("#recalcPDK").prop("disabled", true);
+        $('#lstIndicators').multiselect('disable', false);
+        $("#lstDates").empty();
+        $("#recalcPDK").prop("disabled", false);
+        dateValues = dataForChartRaw[0].map(function (e) { return parseInt(Object.keys(e)[0]) });
+        $("#macroElements").empty();
+        $("#microElements").empty();
+        createCheckboxesDates(dateValues);
+        $("#lstDates").multiselect('reload');
+        loadModal(dataForChartRaw, currentLyrID);
+        $("#formIndicator").show();
+
+        // set selected indicators to first element
+        $("#lstIndicators option:selected").each(function (key, value) {
+            if (value.value == firstElement) {
+                $(value).prop("selected", true)
+            }
+            else {
+                $(value).removeAttr("selected")
+            }
+        })
+
+        $("#lstIndicators").multiselect('reload');
+        $("#lstIndicators").trigger("onSelectAll");
+
+        // return background of elements
+        let elements = returnBlankTemplate();
+        $.each($("form[id=formIndicator] div[class=ms-options] label"), function (key, value) {
+            let element = value.firstChild.defaultValue;
+            if (elements[element]['limit'][limitNumber()]) {
+                //$(value).css("background-color","#c8ff49")
+                $(value).css("background-color", "#ff0000")
             }
             else {
                 //$(value).css("background-color",'#f27e2b')
@@ -701,13 +811,13 @@ function setLine() {
             drawTime: 'afterDatasetsDraw',
             type: 'line',
             mode: 'horizontal',
-            scaleID: current_element == 'ph'?'y-axis-1':'y-axis-0',// select neccessary axe for limit line
+            scaleID: current_element == 'ph' ? 'y-axis-1' : 'y-axis-0',// select neccessary axe for limit line
             value: pdkValue,
             borderWidth: 5,
             borderColor: 'red',
             label: {
                 backgroundColor: "red",
-                content: "Значение ПДК" + add_prefix_to_line+"(" + + pdkValue + ")",
+                content: "Значение ПДК" + add_prefix_to_line + "(" + + pdkValue + ")",
                 enabled: true,
                 position: "center",
                 // for showing label in chart

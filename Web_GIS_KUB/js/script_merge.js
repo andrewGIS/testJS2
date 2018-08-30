@@ -300,7 +300,7 @@ require([
 				document.getElementById('featureCount').innerHTML = 'Кликните по объекту для идентификации';
 				document.getElementById('rightPane').innerHTML = '';
 				//document.getElementById('pager').innerHTML = '';
-				document.getElementById('map').style.right = '290px';
+				document.getElementById('map').style.right = '300px';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);
@@ -345,7 +345,7 @@ require([
 				$('#clearSelBut').hide();
 				$('#previous').hide();
 				$('#next').hide();
-				document.getElementById('map').style.right = '290px';
+				document.getElementById('map').style.right = '300px';
 				mMeasure.setTool("area", false);
 				mMeasure.setTool("distance", false);
 				mMeasure.setTool("location", false);

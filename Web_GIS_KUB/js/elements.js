@@ -214,3 +214,19 @@ function returnSecondTemplate() {
         }
     }
 }
+function return_depth_template(){
+    return discharge = {
+        "h_vod": {
+            "color": "",
+            "alias": "Абсолютная высота залегания",
+            "values": [],
+            "limit": 0
+        },
+        "h_vod_dn_p": {
+            "color": "",
+            "alias": "Глубина залегания вод от дневной поверхности, м",
+            "values": [],
+            "limit": 0
+        }
+    }
+}
