@@ -510,12 +510,13 @@ function recalcPDK() {
 
                     if (name == indicatorsValues[indicator]['alias']) {
 
-                        // for pH set pdk values none 
-                        if (name == "pH" || indicatorsValues[indicator]['limit'][limitNumber()] == 0) {
+                        // for pH set pdk values none or if pdf less than 1
+                        if (name == "pH" || indicatorsValues[indicator]['limit'][limitNumber()] == 0 || (value / indicatorsValues[indicator]['limit'][limitNumber()]).toFixed(2) < 1.00) {
                             return 0
                         }
 
                         return (value / indicatorsValues[indicator]['limit'][limitNumber()]).toFixed(2);
+
                     }
                 }
             });
@@ -656,7 +657,7 @@ function toggleTable_depth() {
         myBar.destroy();
         indicatorsValues = pushElementsValues(dataForChartRaw[1], 2);
         dateValues = dataForChartRaw[1].map(function (e) { return parseInt(Object.keys(e)[0]) });
-        charTitle = "Данные по глубине "+dataForChartRaw[1][0][dateValues[0]]["name"]; // get name from first object
+        charTitle = "Данные по глубине " + dataForChartRaw[1][0][dateValues[0]]["name"]; // get name from first object
         color = Chart.helpers.color;
         colorNames = Object.keys(window.chartColors);
         firstElement = "h_vod";
@@ -687,16 +688,16 @@ function toggleTable_depth() {
             drawTime: 'afterDatasetsDraw',
             type: 'line',
             mode: 'horizontal',
-            scaleID: 'y-axis-0' ,// select neccessary axe for limit line
+            scaleID: 'y-axis-0',// select neccessary axe for limit line
             value: line_value,
             borderWidth: 5,
             borderColor: "#666666",
             label: {
                 backgroundColor: "#666666",
-                content: "Абсолютная высота дневной поверхности - " +line_value + " м",// get absolute height from first object
+                content: "Абсолютная высота дневной поверхности - " + line_value + " м",// get absolute height from first object
                 enabled: true,
                 position: "center",
-                yAdjust: Math.max.apply(null, barChartData.datasets[0].data) -  line_value > 0 ? -10 : 10,
+                yAdjust: Math.max.apply(null, barChartData.datasets[0].data) - line_value > 0 ? -10 : 10,
             }
         }
         myBar.update();
