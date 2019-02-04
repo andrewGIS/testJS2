@@ -71,7 +71,7 @@ function init() {
     $("#modal-name").css({ "display": "block" });
 
     // calculate prefix for PDK for current object
-    add_prefix_to_line = currentLyrID == 9 ? "рх " : "пх "
+    add_prefix_to_line = currentLyrID == 9 ? "рх " : "хр "
 
     barChartData = {
         labels: dateValues.map(function (e) { return formateDate(e) }),
@@ -121,7 +121,7 @@ function init() {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: firstElement == "rashod" ? 'Расход, м³/сек' : firstElement == "h_vod" ? "м" : 'мг/дм³',
+                        labelString: firstElement == "rashod" ? 'Расход, м³/час' : firstElement == "h_vod" ? "м" : 'мг/дм³',
                         fontFamily: "'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'",
                         fontSize: 14,
                         fontStyle: "bold",

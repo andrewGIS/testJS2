@@ -13,6 +13,7 @@
   border-width: 1px;
 }
 #profile_options{
+  display: none;
   position:relative;
   width:15%;
   margin:10px;
@@ -22,13 +23,14 @@
 }
 #profile_graph{
   position:relative;
-  width:85%;
+  width:100%;
   border-style: solid;
   border-width: 1px;
   margin:10px;
   padding: 5px;
 }
 #options_container{
+  display: none;
   display: flex;
   flex-direction: column;
   margin: 10px;

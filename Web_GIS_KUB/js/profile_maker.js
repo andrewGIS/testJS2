@@ -86,7 +86,7 @@ var profileMaker = function () {
                     zoomType: 'x'
                 },
                 series: [{
-                    name: "Значение показателя",
+                    name: "Значения pH",
                     data: [],
                     dataGrouping: {
                         enabled: false
@@ -177,7 +177,7 @@ var profileMaker = function () {
                 return +coord[2].toFixed(2)
             })
             let labelsArr = data.value.features[0].geometry.paths[0].map(function (coord, index, arr) {
-                return index * (step / 1000) + "км."
+                return (index * (step / 10000)).toFixed(1) + "км."
             })
 
             updateChartData(zArray, labelsArr);
@@ -199,7 +199,7 @@ var profileMaker = function () {
         profile_chart.hideLoading();
 
         // profile_chart.setTitle({ text: "Профиль реки " + $("label[for='" + $("#river_choice :checked").attr('id') + "']").html() });
-        profile_chart.setTitle({ text: "Результат расчета " });
+        profile_chart.setTitle({ text: "Изменение водородного показателя (pH) по длине реки" });
         profile_chart.series[0].setData(dataArr);
         profile_chart.xAxis[0].setCategories(labelsArr);
 
